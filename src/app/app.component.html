@@ -59,9 +59,6 @@
           <span mat-line>ABOUT</span>
         </a>
       </mat-nav-list>
-
-
-
     </mat-sidenav>
    
     <!-- <mat-sidenav-content [hidden]="!authService.isAuthenticated()"> -->
@@ -71,9 +68,23 @@
           <mat-icon mat-list-icon>list</mat-icon>
         </button>
         <span style="float:right">
-
+       <div>
+        <mat-form-field appearance="fill" style="position: relative;left: 30%;">
+          <mat-select  [(value)]="selectedValue" (selectionChange)="selected($event.value)">
+            <mat-option [value]="option.value" *ngFor="let option of sites">{{ option.viewValue }}</mat-option>
+            
+          </mat-select>
+       
+          
+        </mat-form-field>
+        <mat-icon  mat-list-icon style="position: relative;left: 31%;" matTooltip="My tooltip">info_outline </mat-icon>
+       </div>
         </span>
+       
       </mat-toolbar>
+      <header>
+        
+      </header>
       <div class="main-content" > <!-- [hidden]="!authService.isAuthenticated()"> -->
         <router-outlet></router-outlet>
       </div>

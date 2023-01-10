@@ -22,6 +22,9 @@ import { NgIdleKeepaliveModule } from '@ng-idle/keepalive';
 import { HomeComponent } from './home/home.component';
 import { PumpInfoDailogComponent } from './pump-info-dailog/pump-info-dailog.component';
 import { DeliverUpdatePageComponent } from './deliver-update-page/deliver-update-page.component';
+import { StoreModule } from '@ngrx/store';
+import { appReducer } from './app.reducer';
+import { AppConfigService } from '../app/app.config.service'
 
 
 @NgModule({
@@ -36,7 +39,8 @@ import { DeliverUpdatePageComponent } from './deliver-update-page/deliver-update
     PriceChangeComponent,
     HomeComponent,
     PumpInfoDailogComponent,
-    DeliverUpdatePageComponent
+    DeliverUpdatePageComponent,
+  
   ],
   imports: [
     BrowserModule,
@@ -46,12 +50,18 @@ import { DeliverUpdatePageComponent } from './deliver-update-page/deliver-update
     HttpClientModule,
     // ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     AppRoutingModule,
-    NgIdleKeepaliveModule.forRoot()
+    StoreModule.forRoot(
+      {
+        app: appReducer,
+      }),
+    NgIdleKeepaliveModule.forRoot(),
+    
   ],
   providers: [
     AuthGuard,
     BackendService,
-    AuthenticationService
+    AuthenticationService,
+    ,AppConfigService
     
   ],
   bootstrap: [AppComponent]
