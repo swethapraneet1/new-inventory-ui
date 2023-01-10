@@ -1,0 +1,129 @@
+<div>
+  <h4>Select Site Details {{viewValue}}</h4>
+<!-- <mat-form-field appearance="fill">
+  <mat-select [(value)]="selectedSites">
+    <mat-option></mat-option>
+    <mat-option [value]="option.value" *ngFor="let option of sites">{{ option.viewValue }}</mat-option>
+  </mat-select>
+  
+</mat-form-field> -->
+</div>
+<div><span>{{date}}</span></div>
+<div class="example-container mat-elevation-z8">
+    <h4></h4>
+    <mat-table #table [dataSource]="dataSource" multiTemplateDataRows  class="mat-elevation-z8">
+      <ng-container matColumnDef="Title">
+        <mat-header-cell *matHeaderCellDef> Pump </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{ element.Title }} </mat-cell>
+      </ng-container>
+  
+      <ng-container matColumnDef="grade1" class="grade1">
+        <mat-header-cell *matHeaderCellDef> Grade1 </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <mat-table
+            #table2
+            [dataSource]="getdata(element.grade[0].differenceData)"
+          >
+            <ng-container matColumnDef="liters">
+              <mat-header-cell *matHeaderCellDef>  </mat-header-cell>
+              <mat-cell *matCellDef="let element2" style="min-width: 60px !important;">
+                {{ element2.liters }} 
+              </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="price">
+              <mat-header-cell *matHeaderCellDef>  </mat-header-cell>
+              <mat-cell *matCellDef="let element2">
+                 <span>&nbsp;</span>{{ element2.price }}
+              </mat-cell>
+            </ng-container>
+            <mat-header-row style="
+            border-bottom: none !important
+        " *matHeaderRowDef="displayedColumns2"></mat-header-row>
+            <mat-row class="graderow" *matRowDef="let row2; columns: displayedColumns2"></mat-row>
+          </mat-table>
+        </mat-cell>
+      </ng-container>
+      <!---grade2-->
+      <ng-container matColumnDef="grade2">
+        <mat-header-cell *matHeaderCellDef> Grade2 </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <mat-table
+           
+            #table2
+            [dataSource]="getdata(element.grade[1].differenceData)"
+          >
+            <ng-container matColumnDef="liters">
+              <mat-header-cell *matHeaderCellDef style="column-gap: 30px">  </mat-header-cell>
+              <mat-cell *matCellDef="let element2" style="min-width: 60px !important;">
+                <!-- {{ element2.Date | date: 'yyyy/MM/dd' }} -->
+                {{ element2.liters }}  
+              </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="price">
+              <mat-header-cell *matHeaderCellDef >  </mat-header-cell>
+              <mat-cell *matCellDef="let element2">
+                <span>&nbsp;</span> <span>&nbsp;</span> {{ element2.price }}
+              </mat-cell>
+            </ng-container>
+            <mat-header-row  style="
+            border-bottom: none !important
+        " *matHeaderRowDef="displayedColumns2"></mat-header-row>
+            <mat-row  class="graderow" *matRowDef="let row2; columns: displayedColumns2"></mat-row>
+          </mat-table>
+        </mat-cell>
+      </ng-container>
+      <!---end of grade2-->
+      <!---grade3-->
+      <ng-container matColumnDef="grade3">
+        <mat-header-cell *matHeaderCellDef> Grade3 </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <mat-table
+            #table2
+            [dataSource]="getdata(element.grade[2].differenceData)"
+          >
+            <ng-container matColumnDef="liters">
+              <mat-header-cell *matHeaderCellDef>  </mat-header-cell>
+              <mat-cell *matCellDef="let element2" style="min-width: 60px !important;">
+                <!-- {{ element2.Date | date: 'yyyy/MM/dd' }} -->
+                {{ element2.liters }} 
+              </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="price">
+              <mat-header-cell *matHeaderCellDef>  </mat-header-cell>
+              <mat-cell *matCellDef="let element2">
+                <span>&nbsp;</span>{{ element2.price }}
+              </mat-cell>
+            </ng-container>
+            <mat-header-row  style="border-bottom: none !important" *matHeaderRowDef="displayedColumns2"></mat-header-row>
+            <mat-row class="graderow" *matRowDef="let row2; columns: displayedColumns2"></mat-row>
+          </mat-table>
+        </mat-cell>
+      </ng-container>
+      <!---end of grade3-->
+      <ng-container matColumnDef="id">
+        <mat-header-cell *matHeaderCellDef style="justify-content:right;">
+          <!-- <button mat-button style="color:white; background-color:darkgrey" (click)="resetListFilter()">Reset</button> -->
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element" style="justify-content:right;">
+          <!-- <button mat-mini-fab style="background-color:teal; min-height: 30px;   margin: 5px;"
+            [routerLink]="['/customers/edit/', customer.id]">
+            <mat-icon>edit</mat-icon>
+          </button> -->
+           <button 
+            (click)="openDialog(element)"> More Info
+            <!-- <mat-icon  (click)="openDialog(element)">More Info</mat-icon> -->
+          </button>
+        </mat-cell>
+      </ng-container>
+     
+      <mat-header-row style="background-color:#00b8ff" *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns"
+      ></mat-row>
+      <!-- <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: displayedColumns;" class="example-element-row"
+    [class.example-expanded-row]="row.expanded" (click)="toggleRow(row)">
+  </mat-row> 
+  <mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></mat-row> -->
+    </mat-table>
+  </div>
+  

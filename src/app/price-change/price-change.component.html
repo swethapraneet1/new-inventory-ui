@@ -1,0 +1,88 @@
+
+<div>
+  <mat-form-field appearance="fill">
+    <mat-select>
+      <mat-option></mat-option>
+      <mat-option [value]="option.value" *ngFor="let option of grades">{{ option.gradeName }}</mat-option>
+    </mat-select>
+    
+  </mat-form-field>
+</div>
+<form [formGroup]="form" (ngSubmit)="savePriceChange()" >
+
+  <mat-card class="mat-elevation-z8">
+
+
+    <mat-table
+      #table
+      class="mat-elevation-z0"
+      [dataSource]="dataSource" [trackBy]="trackRows">
+       <!-- Pump Column -->
+       <ng-container matColumnDef="pump">
+        <!-- <mat-header-cell *matHeaderCellDef>Product</mat-header-cell>  -->
+       <mat-cell *matCellDef="let row; let i = index"> 
+         <ng-container [formGroup]="row">
+           <mat-form-field>
+             <mat-label>pump</mat-label>
+             <input matInput  placeholder="pump"
+               id="pump_id_{{i}}"
+               name="pump_id_{{i}}"
+               formControlName="pump" [readonly]="true"  />
+          
+           </mat-form-field>
+         </ng-container>
+       </mat-cell>
+     </ng-container>
+
+      <!-- Product Column -->
+      <ng-container matColumnDef="product">
+         <!-- <mat-header-cell *matHeaderCellDef>Product</mat-header-cell>  -->
+        <mat-cell *matCellDef="let row; let i = index"> 
+          <ng-container [formGroup]="row">
+            <mat-form-field>
+              <mat-label>Liters</mat-label>
+              <input matInput placeholder="liters"
+                id="liters_id_{{i}}"
+                name="liters_id_{{i}}"
+                formControlName="liters" required  />
+            </mat-form-field>
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <!-- Unit Column -->
+      <ng-container matColumnDef="unit">
+         <!-- <mat-header-cell *matHeaderCellDef>Unit</mat-header-cell>  -->
+        <mat-cell *matCellDef="let row; let i = index"> 
+          <ng-container [formGroup]="row">
+            <mat-form-field>
+              <mat-label>Price</mat-label>
+              <input matInput placeholder="price"
+                id="price_id_{{i}}"
+                name="price_id_{{i}}"
+                formControlName="price" required />
+            </mat-form-field>
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <!-- Header Declarations -->
+      <!-- 
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      -->
+       
+      <!-- Row Declarations -->
+      <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+    </mat-table>
+
+    <mat-card-actions>
+      <!-- <button mat-raised-button color="primary"
+        (click)="createRow()">
+        <mat-icon>add</mat-icon>
+        Add New
+      </button> -->
+      <button type="submit" >submit</button>
+    </mat-card-actions>
+
+  </mat-card>
+</form>

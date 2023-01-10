@@ -1,0 +1,11 @@
+{
+    "token": {
+    "access_token": "fake-token-12345789-abcdefgh",
+    "user": {
+      "firstname": "Admin",
+      "lastname": "",
+      "email": "admin@test.com",
+      "password": "password"
+    }
+  }
+}

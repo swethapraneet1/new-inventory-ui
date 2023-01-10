@@ -1,0 +1,25 @@
+{"data":[{
+    "name":"pump1",
+     "liters":"100L",
+     "price":"$200",
+     "date":"20-12-2022"
+
+    
+},
+{
+    "name":"pump1",
+     "liters":"50L",
+     "price":"$600",
+     "date":"20-12-2022"
+
+    
+},
+{
+    "name":"pump3",
+     "liters":"80L",
+     "price":"$700",
+     "date":"20-12-2022"
+
+    
+}]
+}

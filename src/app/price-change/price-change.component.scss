@@ -1,0 +1,25 @@
+.priceChange {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .mat-form-field--inline {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-flow: row;
+    width: 44%;
+}
+
+.mat-form-field--inline .mat-form-field {
+    display: inline-block;
+    width: 30%;
+    vertical-align: middle;
+}
+
+.mat-form-field--inline .mat-form-field:nth-child(1) {
+    margin-right: 20px;
+}
+.mat-form-field--inline .mat-form-field:nth-child(2) {
+  margin-right: 20px;
+}

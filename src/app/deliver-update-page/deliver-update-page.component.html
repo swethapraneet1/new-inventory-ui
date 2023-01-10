@@ -1,0 +1,71 @@
+<form novalidate (ngSubmit)="savePriceChange()" [formGroup]="deliveryForm">
+  <mat-card>
+    <mat-toolbar style="background-color: #fff">
+      <mat-toolbar-row>
+        <span class="view-card-title">DELIVERY UPDATE</span>
+        <span class="title-spacer"></span>
+      </mat-toolbar-row>
+    </mat-toolbar>
+    <div class="form-container">
+      <mat-form-field appearance="fill">
+        <mat-label>SiteName</mat-label>
+        <mat-select  formControlName="siteName" placeholder="siteName (required)">
+            <mat-option [value]="option.siteId" *ngFor="let option of sites">{{ option.siteName }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>DocterType</mat-label>
+        <input matInput type="number"   formControlName="docType"  placeholder="DocType (required)"/>
+        <mat-error *ngIf="displayMessage.docType">
+            {{displayMessage.docType}}
+          </mat-error>
+      </mat-form-field>
+     
+      <mat-form-field appearance="fill">
+        <mat-label>Time Stamp</mat-label>
+        <input matInput formControlName="timeStamp"  [matDatepicker]="picker" placeholder="TimeStamp (required)" />
+        <mat-hint>MM/DD/YYYY</mat-hint>
+        <mat-datepicker-toggle
+        matSuffix
+          [for]="picker"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>GRADE</mat-label>
+        <mat-select formControlName="grade">
+            <mat-option [value]="option.gradeId" *ngFor="let option of grade">{{ option.gradeName }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Price</mat-label>
+        <input matInput id="PriceId" type="currency" placeholder="Price (required)"
+        formControlName="price" />
+      <mat-error *ngIf="displayMessage.price">
+        {{displayMessage.price}}
+      </mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Fuel Left</mat-label>
+        <input matInput />
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Company</mat-label>
+        <input matInput />
+      </mat-form-field>
+      <mat-card-actions>
+        <button
+          mat-mini-fab
+          class="primary"
+          style="margin-right: 10px; background-color: darkgray"
+          type="submit"    [disabled]='!deliveryForm.valid'
+        >
+          <mat-icon>save</mat-icon>
+        </button>
+        <button mat-mini-fab class="" style="margin-right: 10px">
+          <mat-icon>reset</mat-icon>
+        </button>
+      </mat-card-actions>
+    </div>
+  </mat-card>
+</form>
