@@ -13,20 +13,24 @@ import {
   HttpErrorResponse,
   HttpResponse,
 } from '@angular/common/http';
+import { AppConfigService } from '../app.config.service';
 
 @Injectable()
 export class BackendService {
-  private baseUrl: string = 'http://localhost:3000/';
+  baseUrl:string;
   ds: any;
   authService: AuthenticationService;
-  constructor(private http: HttpClient, private location: Location,private injector: Injector) {
+  constructor(private http: HttpClient, private location: Location,private injector: Injector,private appConfig: AppConfigService) {
     // console.log(http);
     // this.location.prepareExternalUrl(this.baseUrl);
     this.ds = Object.assign({}, db) || {};
     console.log(this.ds);
+    this.baseUrl = this.appConfig.getBaseURL();
+    console.log("baseURL",this.baseUrl)
   }
   ngOnInit(){
   this.authService = this.injector.get(AuthenticationService);
+
  }
   getModel(action) {
     if (action.includes('?') && action.includes('/')) {

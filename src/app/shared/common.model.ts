@@ -1,9 +1,9 @@
 
    export  interface Grade {
-        gradeId: string;
-        gradeName: string;
+        id: number;
+        name: string;
       }
-   export  interface Site {
+      export  interface Site {
         siteId: string;
         siteName: string;
       }

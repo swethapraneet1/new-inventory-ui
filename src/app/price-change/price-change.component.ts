@@ -1,173 +1,145 @@
-import { Component, ViewChild,OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormArray, AbstractControl } from '@angular/forms';
+import { Component, ViewChild, OnInit, ChangeDetectorRef } from '@angular/core';
+import {
+  FormGroup,
+  FormBuilder,
+  Validators,
+  FormArray,
+  AbstractControl,
+  FormControl,
+} from '@angular/forms';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
-import { ApicallService } from './price.service'
-export interface PriceChange {
-  id: number;
-  avatar: string;
-  firstname: string;
-  lastname: string;
-  rewards: number;
-  email: string;
-  membership: boolean;
-  mobile: string;
-  phone: string;
-}
-interface grade {
-  gradeId: string;
-  gradeName: string;
-}
+import { ApicallService } from './price.service';
+import { Grade } from '../shared/common.model';
+import { selectSiteId } from '../../app/app.selectors';
+import { Store } from '@ngrx/store';
+import { ActivatedRoute, Router } from '@angular/router';
+
 @Component({
   selector: 'app-price-change',
   templateUrl: './price-change.component.html',
   styleUrls: ['./price-change.component.scss'],
 })
-
 export class PriceChangeComponent implements OnInit {
-  grades: grade[] = [
-    { gradeId: '1', gradeName: 'grade1' },
-    { gradeId: '2', gradeName: 'grade2' },
-    { gradeId: '3', gradeName: 'grade3' },
-  ];
-  selectedGrades= this.grades[0].gradeId;
+  grades = [];
+  selectedGrades: null;
   form: FormGroup;
   private formSubmitAttempt: boolean;
   private uid = 0;
   disabled: boolean = true;
-  header =[
-    {
-      Group: 1,
-      grade: [
-      ],
-      Title: 'PUMP1',
-      pumpId: '1',
-      pumpName: 'pump 1',
-    },
-    {
-      Group: 1,
-      grade: [
-      ],
-      Title: 'PUMP2',
-      pumpId: '1',
-      pumpName: 'pump 2',
-    },
-    {
-      Group: 1,
-      grade: [
-      
-      ],
-  
-      Title: 'PUMP3',
-      pumpId: '1',
-      pumpName: 'pump 3',
-    },
-    {
-      Group: 1,
-      grade: [
-      ],
-  
-      Title: 'PUMP2',
-      pumpId: '1',
-      pumpName: 'pump 2',
-    },
-    {
-      Group: 1,
-      grade: [
-      
-      ],
-  
-      Title: 'PUMP4',
-      pumpId: '1',
-      pumpName: 'pump 4',
-    },
-  ];
-  
+  showForm: boolean = true;
+  pumpData: any;
+  site: string = '';
+  isDisiable = 'false';
 
   @ViewChild('table') table: MatTable<any>;
 
-  displayedColumns = ['pump','product', 'unit'];
-  displayedColumns2=['Title','pumpName']
+  displayedColumns = ['pump', 'literValue', 'dollarValue'];
   dataSource: MatTableDataSource<AbstractControl>;
-  
 
   get productControlArray() {
     return this.form.get('products') as FormArray;
   }
-
-  constructor(private fb: FormBuilder,private api:ApicallService) {
+  constructor(
+    private fb: FormBuilder,
+    private api: ApicallService,
+    private store: Store,
+    private router: Router,
+    private changeDetectorRefs: ChangeDetectorRef
+  ) {
     this.createForm();
-    this.addRow();
-    this.dataSource = new MatTableDataSource(
-      this.productControlArray.controls);
+    this.dataSource = new MatTableDataSource(this.productControlArray.controls);
+    this.store.select(selectSiteId).subscribe((siteId) => {
+      if (siteId !== this.site) {
+        this.site = siteId;
+        this.gradeCall();
+        this.selectedGrades = null;
+        this.showForm = true;
+      }
+    });
   }
-
+  gradeCall() {
+    this.api.getGradeNames(this.site).subscribe((data) => {
+      this.grades = data;
+    });
+  }
   createForm() {
     this.form = this.fb.group({
-      products: this.fb.array([
-      ]),
+      products: this.fb.array([]),
     });
   }
 
   trackRows(index: number, row: AbstractControl) {
     return row.value.uid;
   }
-  savePriceChange(){
-  //  let arr = this.header.map(val=>{
-  //     this.form.value.products.map(val1=>{
-  //       return val.grade.push(val1);
-  //     })
-    
-  //   })
-    for(var i =0; i<this.header.length;i++){
-       for(var j=i; j<this.form.value.products.length;j++){
-        // tslint:disable-next-line: triple-equals
-        if(i===j){
-          this.header[i].grade.push({
-            grade_id:'grade',
-            grade_name:'gradename',
-            differncedata:[{ uid: this.form.value.products[j].uid,
-              liters: this.form.value.products[j].liters,
-              price: this.form.value.products[j].price}]
-           });
-        }
-        
-     }
-    }
-    console.log(this.form.value,this.header)
+  savePriceChange() {
+    console.log(this.form.value.products.value);
+    this.isDisiable = 'false';
+    let grade = [];
+    grade.push({
+      gradeId: this.selectedGrades,
+      siteId: this.site,
+      pump: this.form.value.products,
+    });
+    this.router.navigate(['/PriceChange']);
+    this.api.SaveForm(grade).subscribe((data) => {
+      // saved sucessflly messgae should come after that show popup and reset the form and grade dropdwon
+    });
   }
   private addRow() {
     const rows = this.productControlArray;
-    for(let i=0; i<this.header.length; i++){
+    for (let i = 0; i < this.pumpData.length; i++) {
       rows.push(
         this.fb.group({
           uid: this.nextUid(),
-          liters: [0, Validators.required],
-          price: [0, Validators.required],
-          pump:[this.header[i].pumpName,{value: '', disabled: true}, Validators.required]
+          literValue: [0, Validators.required],
+          dollarValue: [0, Validators.required],
+          pump: [
+            this.pumpData[i]['pumpName'],
+            { value: '', disabled: true },
+            Validators.required,
+          ],
         })
       );
     }
-   
+    this.showForm = false;
   }
-  
+
   createRow() {
     this.addRow();
     this.table.renderRows();
   }
- 
+
   private nextUid() {
-    ++this.uid
+    ++this.uid;
     return this.uid;
   }
-ngOnInit(): void {
- 
-    this.api
-    .getGradeNames()
-    .subscribe((data) => {
-      console.log("price",data);
-     
+  selectedGrade(value) {
+    this.selectedGrades = value;
+    this.isDisiable = 'true';
+    this.api.getFormInput(value).subscribe((data) => {
+      this.pumpData = data;
+      this.changeDetectorRefs.detectChanges();
+      if (this.pumpData.length > 0) {
+        this.createRow();
+      } else {
+      }
     });
-  // this.form.controls['pump'].disable();
-}
-
+  }
+  ngOnInit(): void {
+  }
+  formRest() {
+    this.productControlArray.controls = [];
+    this.changeDetectorRefs.detectChanges();
+    this.form.reset();
+    this.selectedGrades = null;
+    this.isDisiable = 'false';
+    this.pumpData = [];
+    this.showForm = true;
+  }
+  ngOnDestroy() {
+    this.showForm = true;
+    this.form.reset();
+    this.selectedGrades = null;
+    this.isDisiable = 'false';
+  }
 }

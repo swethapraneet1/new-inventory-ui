@@ -1,8 +1,8 @@
 import { Grade,Site } from './common.model';
 export const grade: Grade[] = [
-    { gradeId: '1', gradeName: 'grade1' },
-    { gradeId: '2', gradeName: 'grade2' },
-    { gradeId: '3', gradeName: 'grade3' },
+    { id: 1, name: 'grade1' },
+    { id: 2, name: 'grade2' },
+    { id: 3, name: 'grade3' },
 ]
 export const site: Site[] = [
     { siteId: '1', siteName: 'site' },

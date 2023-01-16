@@ -1,14 +1,14 @@
 
 <div>
   <mat-form-field appearance="fill">
-    <mat-select>
-      <mat-option></mat-option>
-      <mat-option [value]="option.value" *ngFor="let option of grades">{{ option.gradeName }}</mat-option>
+    <mat-label>Select Grade</mat-label>
+    <mat-select (selectionChange)="selectedGrade($event.value)"[disabled]='isDisiable' [(ngModel)]="selectedGrades">
+      <mat-option [value]="option.id" *ngFor="let option of grades">{{ option.name }}</mat-option>
     </mat-select>
     
   </mat-form-field>
 </div>
-<form [formGroup]="form" (ngSubmit)="savePriceChange()" >
+<form [formGroup]="form" (ngSubmit)="savePriceChange()"  [hidden]="showForm" >
 
   <mat-card class="mat-elevation-z8">
 
@@ -35,7 +35,7 @@
      </ng-container>
 
       <!-- Product Column -->
-      <ng-container matColumnDef="product">
+      <ng-container matColumnDef="literValue">
          <!-- <mat-header-cell *matHeaderCellDef>Product</mat-header-cell>  -->
         <mat-cell *matCellDef="let row; let i = index"> 
           <ng-container [formGroup]="row">
@@ -44,14 +44,14 @@
               <input matInput placeholder="liters"
                 id="liters_id_{{i}}"
                 name="liters_id_{{i}}"
-                formControlName="liters" required  />
+                formControlName="literValue" required  />
             </mat-form-field>
           </ng-container>
         </mat-cell>
       </ng-container>
 
       <!-- Unit Column -->
-      <ng-container matColumnDef="unit">
+      <ng-container matColumnDef="dollarValue">
          <!-- <mat-header-cell *matHeaderCellDef>Unit</mat-header-cell>  -->
         <mat-cell *matCellDef="let row; let i = index"> 
           <ng-container [formGroup]="row">
@@ -60,7 +60,7 @@
               <input matInput placeholder="price"
                 id="price_id_{{i}}"
                 name="price_id_{{i}}"
-                formControlName="price" required />
+                formControlName="dollarValue" required />
             </mat-form-field>
           </ng-container>
         </mat-cell>
@@ -81,7 +81,8 @@
         <mat-icon>add</mat-icon>
         Add New
       </button> -->
-      <button type="submit" >submit</button>
+      <button   type="submit" mat-button color="primary">submit</button>
+      <button  (click)="formRest()" type="reset" mat-button color="primary">Reset</button>
     </mat-card-actions>
 
   </mat-card>
