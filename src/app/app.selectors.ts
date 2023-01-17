@@ -7,3 +7,8 @@ export const selectSiteId = createSelector(
   selectApp,
   state => state.siteId
 );
+export const getSiteDropdwon = createSelector(
+  selectApp,
+  state=>state.dropdown
+
+)

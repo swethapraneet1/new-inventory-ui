@@ -3,7 +3,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 
 import { AuthenticationService } from '../_services';
 
-
+import { Store } from '@ngrx/store';
+import { AppAction } from '../app.action';
 @Component({
   selector: 'login-form',
   templateUrl: './login.component.html',
@@ -22,13 +23,14 @@ export class LoginComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private authenticationService: AuthenticationService,
+    private store:Store
   
   ) {}
 
   ngOnInit() {
     // this.authenticationService.logout();
-    this.model.username = 'Admin@test.com';
-    this.model.password = 'password';
+    this.model.username = 'karthik';
+    this.model.password = 'karthik';
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || 'loading';
     // this.isloading = false;
     // this.isAuthenticated =  false;
@@ -42,7 +44,10 @@ export class LoginComponent implements OnInit {
       () => {
         // this.isAuthenticated =  true;
         console.log(' next action here ... ');
-        
+        const userData = JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
+        if (userData && userData.token) {
+          this.store.dispatch(AppAction.getSitesDropdown());
+        }
       },
       (error) => {
         console.log(error);

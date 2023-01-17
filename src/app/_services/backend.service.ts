@@ -1,10 +1,10 @@
-import { Injectable,Injector } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import { Location } from '@angular/common';
 // import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Rx';
 import { User } from '../_models';
 import db from './demo.db';
- import { AuthenticationService } from './authentication.service';
+import { AuthenticationService } from './authentication.service';
 import {
   HttpClient,
   HttpRequest,
@@ -14,24 +14,30 @@ import {
   HttpResponse,
 } from '@angular/common/http';
 import { AppConfigService } from '../app.config.service';
-
+import { RestService } from './model.service';
+const sitesApi = '/sites'
 @Injectable()
 export class BackendService {
-  baseUrl:string;
+  baseUrl: string;
   ds: any;
   authService: AuthenticationService;
-  constructor(private http: HttpClient, private location: Location,private injector: Injector,private appConfig: AppConfigService) {
+  constructor(
+    private http: HttpClient,
+    private location: Location,
+    private injector: Injector,
+    private appConfig: AppConfigService,
+    private restService:RestService
+  ) {
     // console.log(http);
     // this.location.prepareExternalUrl(this.baseUrl);
     this.ds = Object.assign({}, db) || {};
     console.log(this.ds);
     this.baseUrl = this.appConfig.getBaseURL();
-    console.log("baseURL",this.baseUrl)
+    console.log('baseURL', this.baseUrl);
   }
-  ngOnInit(){
-  this.authService = this.injector.get(AuthenticationService);
-
- }
+  ngOnInit() {
+    this.authService = this.injector.get(AuthenticationService);
+  }
   getModel(action) {
     if (action.includes('?') && action.includes('/')) {
       return action.indexOf('?') > action.indexOf('/')
@@ -170,46 +176,57 @@ export class BackendService {
   }
 
   login(action: string, user: User) {
-    console.log("loginaction",action);
+    console.log('loginaction', action);
     const self = this;
-   // console.log('login', this.ds);
-   //return this.http.get("http://localhost:3000/token");
-   //return this.http.post('http://localhost:3000/token', JSON.stringify(user), this.form());
-    return Observable.fromPromise(
-      new Promise(function (resolve, reject) {
-        const { access_token, user } = self.ds.token;
-        setTimeout(resolve, 200, {
-         //  data: {
-          access_token,
-          user,
-         //  }
-        });
-      })
-    );
+    console.log("self",self);
+    // console.log('login', this.ds);
+    //return this.http.get("http://localhost:3000/token");
+    return this.http.post("https://fuel-inventory-backend.onrender.com/api/v1/signin", JSON.stringify(user), this.form());
+    // return Observable.fromPromise(
+    //   new Promise(function (resolve, reject) {
+    //     const { access_token, user } = self.ds.token;
+    //     setTimeout(resolve, 200, {
+    //      //  data: {
+    //       access_token,
+    //       user,
+    //      //  }
+    //     });
+    //   })
+    // );
   }
-// Home page Table loading//
-getAllTableData(){
-  let action = 'Pumpdata'
-  return this.http.get(this.baseUrl + action, this.jwt());
-}
-getTabledataPost(action:string,data:any){
-  const url = `${this.baseUrl}${action}`
-  return this.http.post(url, data, this.jwt());
-}
-//end of home page table loading
+  getAllSites() {
+    // console.log(JSON.parse(localStorage.getItem('FUEL_INVENTORY')));
+     let action = 'sites';
+    // let userinfo =JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
+    // console.log("info",userinfo);
+    // return this.http.get(this.baseUrl + action, this.jwt());app
+    
+    return this.restService.get(action);
+  }
+  // Home page Table loading//
+  getAllTableData() {
+    let action = 'Pumpdata';
+    return this.http.get(this.baseUrl + action, this.jwt());
+  }
+  getTabledataPost(action: string, data: any) {
+    const url = `${this.baseUrl}${action}`;
+    return this.http.post(url, data, this.jwt());
+  }
+  //end of home page table loading
 
-//Delivery Upadte//
-deliveryUpdateSave(action: string, data: any) {
-  const url = `${this.baseUrl}${action}`;
-  //const data  =[];
- // return data;
-  return this.http.post(url, data, this.jwt());
-}
-//end of delivery update
+  //Delivery Upadte//
+  deliveryUpdateSave(action: string, data: any) {
+    const url = `${this.baseUrl}${action}`;
+    //const data  =[];
+    // return data;
+    return this.http.post(url, data, this.jwt());
+  }
+  //end of delivery update
   //private helper methods
   private form() {
     let headers = new HttpHeaders({
-      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': 'https://fuel-inventory-backend.onrender.com/api/v1/'
     });
     return { headers: headers };
   }
@@ -222,19 +239,17 @@ deliveryUpdateSave(action: string, data: any) {
     //   return { headers } ;
     // }
     //  create authorization header with jwt token
-      let user = JSON.parse(localStorage.getItem('NG_CRM_USER_2.0'));
-      if (user && user.token) {
-        // let headers = new Headers({ 'Authorization': 'Bearer ' + currentUser.token });
-        // return new RequestOptions({ headers: headers });
-        let headers = { 'Authorization': 'Bearer ' + user.token };
-       return { headers } ;
-      }
+    let user = JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
+    if (user && user.token) {
+      // let headers = new Headers({ 'Authorization': 'Bearer ' + currentUser.token });
+      // return new RequestOptions({ headers: headers });
+      let headers = { Authorization: 'Bearer ' + user.token };
+      return { headers };
+    }
   }
 
   // private handleError(error: Response) {
   //   console.error(error);
   //   return Observable.throw(error.json() || 'Server error');
   // }
-
-
 }

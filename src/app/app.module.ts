@@ -24,7 +24,10 @@ import { PumpInfoDailogComponent } from './pump-info-dailog/pump-info-dailog.com
 import { DeliverUpdatePageComponent } from './deliver-update-page/deliver-update-page.component';
 import { StoreModule } from '@ngrx/store';
 import { appReducer } from './app.reducer';
-import { AppConfigService } from '../app/app.config.service'
+import { AppConfigService } from '../app/app.config.service';
+import { EffectsModule } from '@ngrx/effects'
+import { AppEffects } from '../app/app.effects'; 
+import { RestService } from './_services/model.service';
 
 
 @NgModule({
@@ -40,7 +43,6 @@ import { AppConfigService } from '../app/app.config.service'
     HomeComponent,
     PumpInfoDailogComponent,
     DeliverUpdatePageComponent,
-  
   ],
   imports: [
     BrowserModule,
@@ -55,13 +57,16 @@ import { AppConfigService } from '../app/app.config.service'
         app: appReducer,
       }),
     NgIdleKeepaliveModule.forRoot(),
-    
+    EffectsModule.forRoot([
+      AppEffects
+    ]),
   ],
   providers: [
     AuthGuard,
     BackendService,
     AuthenticationService,
-    ,AppConfigService
+    ,AppConfigService,
+    RestService
     
   ],
   bootstrap: [AppComponent]

@@ -25,6 +25,7 @@
     "@angular/router": "~9.1.9",
     "@ng-idle/core": "^11.1.0",
     "@ng-idle/keepalive": "^11.0.3",
+    "@ngrx/effects": "^9.2.1",
     "@ngrx/store": "^9.2.1",
     "rxjs": "~6.5.4",
     "rxjs-compat": "^6.5.5",

@@ -3,11 +3,13 @@ import { AppAction } from './app.action';
 
 interface AppState {
 
-  siteId: string;
+  siteId: number;
+  dropdown: any;
 }
 
 const initialState: AppState = {
-  siteId: '1'
+  siteId: 1,
+  dropdown:[]
 };
 
 export const appReducer = createReducer(
@@ -15,6 +17,16 @@ export const appReducer = createReducer(
   on(AppAction.setSiteSelection, (state, {siteId}) => ({
     ...state,
     siteId,
+  })),
+  on(AppAction.getSitesDropdownSuccess, (state, { dropdown }) => ({
+    ...state,
+    dropdown,
+    loading: false,
+  })),
+  on(AppAction.getSitesDropdownError, (state, error) => ({
+    ...state,
+    error,
+    loading: false,
   })),
 );
 
