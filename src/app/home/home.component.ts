@@ -14,7 +14,7 @@ import { getLocaleDateFormat } from '@angular/common';
 import { AuthenticationService } from '../_services';
 import { Store } from '@ngrx/store';
 import { setSiteSelection } from '../../app/app.action';
-import { selectSiteId } from '../../app/app.selectors';
+import { selectSiteId,getSiteDropdwon,getUserDetails } from '../../app/app.selectors';
 interface sites {
   value: string;
   viewValue: string;
@@ -70,10 +70,14 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     //let val = this.authService.siteValue()
+   
     this.store.select(selectSiteId).subscribe((siteId) => {
       this.site = siteId;
       console.log('home', this.site);
     });
+    this.store.select(getUserDetails).subscribe((user)=>{
+      console.log('home',user)
+    })
     this.getTableData();
     this.getTableDatapost();
   }

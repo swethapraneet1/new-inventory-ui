@@ -23,8 +23,9 @@
        <!-- // <button (click)="reset()" *ngIf="timedOut">Restart</button> -->
             </span>
           </div>
+          <span>{{user.firstname}}</span>
           <mat-card-title [hidden]="user!==null && user!==undefined" style="padding:5px;">
-            {{user?.firstname}} {{user?.lastname}}
+            {{user?.firstname}} {{user?.lastname}} 
           </mat-card-title>
 
           <button mat-icon-button [matMenuTriggerFor]="menu">
@@ -71,7 +72,7 @@
        <div>
         <mat-form-field appearance="fill" style="position: relative;left: 30%;">
           <mat-select  [(value)]="selectedValue" (selectionChange)="selected($event.value)">
-            <mat-option [value]="option.value" *ngFor="let option of sites">{{ option.viewValue }}</mat-option>
+            <mat-option [value]="option.siteId" *ngFor="let option of sites">{{ option.siteName }}</mat-option>
             
           </mat-select>
        

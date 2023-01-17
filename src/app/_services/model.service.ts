@@ -78,6 +78,8 @@ export class RestService {
         const user = JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
         if (user && user.token) {
             headers = headers.set('Authorization', 'Bearer ' + user.token);
+            headers = headers.set('Content-Type', 'application/json');
+            headers = headers.set('Access-Control-Allow-Origin', 'https://fuel-inventory-backend.onrender.com/api/v1/');
         }else{
             headers = headers.set('Content-Type', 'application/json');
         }

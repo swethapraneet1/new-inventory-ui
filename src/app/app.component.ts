@@ -19,14 +19,14 @@ import { Keepalive } from '@ng-idle/keepalive';
 import { stringify } from 'querystring';
 import { Store } from '@ngrx/store';
 import { setSiteSelection } from '../app/app.action';
-import { selectSiteId } from '../app/app.selectors';
+import { selectSiteId, getSiteDropdwon } from '../app/app.selectors';
 import { Site } from '../app/shared/common.model';
 import { BackendService } from '../app/_services/backend.service';
-
+import { AppAction } from '../app/app.action';
 
 interface sites {
-  value: string;
-  viewValue: string;
+  siteId: string;
+  siteName: string;
 }
 @Component({
   selector: 'app-root',
@@ -41,16 +41,16 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
   uiContent = 'content';
   progrssBarClass = 'progress-bar';
   isloading = true;
-  idleState = 'Not started.';
+  idleState = '';
   timedOut = false;
   lastPing?: Date = null;
   countDown: string;
   site: Observable<number>;
-  selectedValue="1"
+  selectedValue: string;
   sites: sites[] = [
-    { value: '1', viewValue: 'site1' },
-    { value: '2', viewValue: 'site2' },
-    { value: '3', viewValue: 'site3' },
+    // { value: '1', viewValue: 'site1' },
+    // { value: '2', viewValue: 'site2' },
+    // { value: '3', viewValue: 'site3' },
   ];
 
   constructor(
@@ -63,14 +63,14 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
     private store: Store,
     private backendService: BackendService
   ) {
-    console.log(' constructor');
+    // console.log(' constructor');
 
     this.isloading = true;
-     
+
     breakpointObserver
       .observe([Breakpoints.HandsetLandscape, Breakpoints.HandsetPortrait])
       .subscribe((result) => {
-        console.log(result);
+        // console.log(result);
         if (result.matches) {
           // this.activateHandsetLayout();
           this.isMobile = true;
@@ -110,13 +110,13 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
     // keepalive.interval(15);
 
     // keepalive.onPing.subscribe(() => (this.lastPing = new Date()));
-  
+
     // this.reset();
     //   // auto logout timer code starts
   }
 
   ngOnChanges() {
-    console.log(' ngOnChanges');
+    // console.log(' ngOnChanges');
   }
   reset() {
     this.idle.watch();
@@ -126,15 +126,25 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnInit(): void {
     console.log('ngOnInit');
+    this.user = this.authService.getUser();
+    this.isloading = false;
+    this.store.dispatch(AppAction.getSitesDropdown());
     this.store.select(selectSiteId).subscribe((siteId) => {
       this.site = siteId;
     });
-    this.user = this.authService.getUser();
-    this.isloading = false;
+    this.store.select(getSiteDropdwon).subscribe((dropdown) => {
+      if (dropdown.res) {
+        let dropDownValue = dropdown.res;
+        console.log('app', dropDownValue.sites[0], this.sites);
+        this.sites = dropDownValue.sites[0];
+        this.selectedValue = this.sites[0].siteId;
+        this.store.dispatch(setSiteSelection({ siteId: this.sites[0].siteId }));
+      }
+    });
   }
 
   logout(): void {
-    // localStorage.removeItem('currentUser');
+    localStorage.removeItem('user');
     this.authService.logout();
     this.router.navigate(['login']);
   }
@@ -146,7 +156,7 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
   isAuth(isAuth?: any) {
     if (isAuth) {
       this.user = this.authService.getUser();
-      // this.user = JSON.parse(localStorage.getItem(APP_USER_PROFILE)) || <User>{};
+       this.user = JSON.parse(localStorage.getItem('FUEL_INVENTORY')) || {};
     }
   }
 
@@ -172,6 +182,7 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
   ngOnDestroy() {
     this.breakpointObserver.ngOnDestroy();
     this.authService.logout();
+    localStorage.clear();
     //   this.router.events
     // this.breakpoint.
   }

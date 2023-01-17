@@ -9,6 +9,17 @@ export const selectSiteId = createSelector(
 );
 export const getSiteDropdwon = createSelector(
   selectApp,
-  state=>state.dropdown
+  state => state.dropdown
 
-)
+);
+export const getGradeDropdwon = createSelector(
+  selectApp,
+  state => state.gradeDropdown
+
+);
+export const getUserDetails = createSelector(
+  selectApp,
+  state => state.user
+
+);
+

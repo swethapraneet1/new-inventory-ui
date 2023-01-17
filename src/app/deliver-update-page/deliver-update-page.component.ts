@@ -68,7 +68,6 @@ export class DeliverUpdatePageComponent implements OnInit {
   ngOnInit(): void {
     this.sites = site;
     this.grade = grade;
-    console.log(this.sites);
     this.deliveryForm = this.fb.group({
       docType: ['', [Validators.required,Validators.maxLength(3)]],
       price: ["", [Validators.required,NumberValidators.range(1, 99999)]],

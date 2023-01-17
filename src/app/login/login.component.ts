@@ -5,6 +5,8 @@ import { AuthenticationService } from '../_services';
 
 import { Store } from '@ngrx/store';
 import { AppAction } from '../app.action';
+import { getUserDetails } from '../app.selectors';
+import { TOUCH_BUFFER_MS } from '@angular/cdk/a11y';
 @Component({
   selector: 'login-form',
   templateUrl: './login.component.html',
@@ -23,8 +25,7 @@ export class LoginComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private authenticationService: AuthenticationService,
-    private store:Store
-  
+    private store: Store
   ) {}
 
   ngOnInit() {
@@ -37,14 +38,15 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
-    
+    this.store.dispatch(AppAction.getUserDetails({ user: this.model }));
     this.isValidating = true;
-    // this.isloading = true;
+    // this.isloading = true
     this.authenticationService.login(this.model).subscribe(
       () => {
         // this.isAuthenticated =  true;
         console.log(' next action here ... ');
         const userData = JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
+        console.log('user', userData);
         if (userData && userData.token) {
           this.store.dispatch(AppAction.getSitesDropdown());
         }

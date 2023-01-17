@@ -3,7 +3,7 @@
   <mat-form-field appearance="fill">
     <mat-label>Select Grade</mat-label>
     <mat-select (selectionChange)="selectedGrade($event.value)"[disabled]='isDisiable' [(ngModel)]="selectedGrades">
-      <mat-option [value]="option.id" *ngFor="let option of grades">{{ option.name }}</mat-option>
+      <mat-option [value]="option.gradeId" *ngFor="let option of grades">{{ option.gradeName }}</mat-option>
     </mat-select>
     
   </mat-form-field>

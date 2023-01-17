@@ -15,7 +15,7 @@ import {
 } from '@angular/common/http';
 import { AppConfigService } from '../app.config.service';
 import { RestService } from './model.service';
-const sitesApi = '/sites'
+const sitesApi = '/sites';
 @Injectable()
 export class BackendService {
   baseUrl: string;
@@ -26,7 +26,7 @@ export class BackendService {
     private location: Location,
     private injector: Injector,
     private appConfig: AppConfigService,
-    private restService:RestService
+    private restService: RestService
   ) {
     // console.log(http);
     // this.location.prepareExternalUrl(this.baseUrl);
@@ -175,13 +175,40 @@ export class BackendService {
     );
   }
 
-  login(action: string, user: User) {
-    console.log('loginaction', action);
+  login(action: any, user: User) {
+    // console.log('loginaction', action);
     const self = this;
-    console.log("self",self);
+    // console.log("self",self);
     // console.log('login', this.ds);
     //return this.http.get("http://localhost:3000/token");
-    return this.http.post("https://fuel-inventory-backend.onrender.com/api/v1/signin", JSON.stringify(user), this.form());
+    return this.http.post(
+      'https://fuel-inventory-backend.onrender.com/api/v1/signin',
+      JSON.stringify(user),
+      this.form()
+    );
+    // return Observable.fromPromise(
+    //   new Promise(function (resolve, reject) {
+    //     const { access_token, user } = self.ds.token;
+    //     setTimeout(resolve, 200, {
+    //      //  data: {
+    //       access_token,
+    //       user,
+    //      //  }
+    //     });
+    //   })
+    // );
+  }
+  logins(user) {
+    // console.log('loginaction', action);
+    const self = this;
+    // console.log("self",self);
+    // console.log('login', this.ds);
+    //return this.http.get("http://localhost:3000/token");
+    return this.http.post(
+      'https://fuel-inventory-backend.onrender.com/api/v1/signin',
+      JSON.stringify(user),
+      this.form()
+    );
     // return Observable.fromPromise(
     //   new Promise(function (resolve, reject) {
     //     const { access_token, user } = self.ds.token;
@@ -196,11 +223,11 @@ export class BackendService {
   }
   getAllSites() {
     // console.log(JSON.parse(localStorage.getItem('FUEL_INVENTORY')));
-     let action = 'sites';
+    let action = 'sites';
     // let userinfo =JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
     // console.log("info",userinfo);
     // return this.http.get(this.baseUrl + action, this.jwt());app
-    
+
     return this.restService.get(action);
   }
   // Home page Table loading//
@@ -211,6 +238,21 @@ export class BackendService {
   getTabledataPost(action: string, data: any) {
     const url = `${this.baseUrl}${action}`;
     return this.http.post(url, data, this.jwt());
+  }
+  getGradeDropdown(site) {
+    console.log('site', site);
+    let action = 'grades/';
+    // let userinfo =JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
+    // console.log("info",userinfo);
+    // return this.http.get(this.baseUrl + action, this.jwt());app
+
+    return this.restService.get(action + site + '/site');
+  }
+  getPumpDetails(){
+    this.restService.get('/pumps')
+  }
+  SaveForm(obj) {
+    return this.restService.post('/pricechange', obj);
   }
   //end of home page table loading
 
@@ -226,7 +268,8 @@ export class BackendService {
   private form() {
     let headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': 'https://fuel-inventory-backend.onrender.com/api/v1/'
+      'Access-Control-Allow-Origin':
+        'https://fuel-inventory-backend.onrender.com/api/v1/',
     });
     return { headers: headers };
   }

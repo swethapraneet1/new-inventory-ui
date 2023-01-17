@@ -10,9 +10,11 @@ import {
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { ApicallService } from './price.service';
 import { Grade } from '../shared/common.model';
-import { selectSiteId } from '../../app/app.selectors';
+import { selectSiteId,getGradeDropdwon } from '../../app/app.selectors';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AppAction } from '../app.action';
+import { BackendService } from '../_services';
 
 @Component({
   selector: 'app-price-change',
@@ -44,7 +46,8 @@ export class PriceChangeComponent implements OnInit {
     private api: ApicallService,
     private store: Store,
     private router: Router,
-    private changeDetectorRefs: ChangeDetectorRef
+    private changeDetectorRefs: ChangeDetectorRef,
+    private backendService:BackendService
   ) {
     this.createForm();
     this.dataSource = new MatTableDataSource(this.productControlArray.controls);
@@ -58,9 +61,20 @@ export class PriceChangeComponent implements OnInit {
     });
   }
   gradeCall() {
-    this.api.getGradeNames(this.site).subscribe((data) => {
-      this.grades = data;
-    });
+    this.store.dispatch(AppAction.getGradeDropDown({siteId:this.site}));
+    this.store.select(getGradeDropdwon).subscribe((gradeDropDown)=>{
+      if(gradeDropDown === undefined){
+        this.store.dispatch(AppAction.getGradeDropDown({siteId:this.site}));
+      }
+      if(gradeDropDown !== undefined){
+        this.grades = gradeDropDown.res.grades[0];
+        console.log(this.grades);
+      }
+     
+    })
+    // this.api.getGradeNames(this.site).subscribe((data) => {
+    //   this.grades = data;
+    // });
   }
   createForm() {
     this.form = this.fb.group({
@@ -80,8 +94,10 @@ export class PriceChangeComponent implements OnInit {
       siteId: this.site,
       pump: this.form.value.products,
     });
+    console.log(grade[0]);
     this.router.navigate(['/PriceChange']);
-    this.api.SaveForm(grade).subscribe((data) => {
+    this.backendService.SaveForm(grade[0]).subscribe((data) => {
+      console.log(data);
       // saved sucessflly messgae should come after that show popup and reset the form and grade dropdwon
     });
   }
@@ -90,7 +106,7 @@ export class PriceChangeComponent implements OnInit {
     for (let i = 0; i < this.pumpData.length; i++) {
       rows.push(
         this.fb.group({
-          uid: this.nextUid(),
+         // uid: this.nextUid(),
           literValue: [0, Validators.required],
           dollarValue: [0, Validators.required],
           pump: [
@@ -126,6 +142,7 @@ export class PriceChangeComponent implements OnInit {
     });
   }
   ngOnInit(): void {
+    this.gradeCall();
   }
   formRest() {
     this.productControlArray.controls = [];
