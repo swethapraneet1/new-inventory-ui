@@ -234,12 +234,14 @@ export class BackendService {
     return this.restService.get('/grades')
   }
   // Home page Table loading//
-  getAllTableData(site) {
+  getAllTableData() {
     let action = '/home/';
+    let site =1;
     return this.restService.get(action + site,);
   }
-  getTabledataPost(site) {
+  getTabledataPost() {
     let action = '/home/';
+    let site=1;
     return this.restService.get(action + site,);
   }
   getGradeDropdown(site) {
