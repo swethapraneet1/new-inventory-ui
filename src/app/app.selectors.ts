@@ -22,4 +22,8 @@ export const getUserDetails = createSelector(
   state => state.user
 
 );
+export const getTotalGrades = createSelector(
+  selectApp,
+  state => state.grades
 
+);

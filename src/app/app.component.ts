@@ -129,6 +129,7 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
     this.user = this.authService.getUser();
     this.isloading = false;
     this.store.dispatch(AppAction.getSitesDropdown());
+    this.store.dispatch(AppAction.getTotalGrades());
     this.store.select(selectSiteId).subscribe((siteId) => {
       this.site = siteId;
     });

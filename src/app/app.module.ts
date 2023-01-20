@@ -28,6 +28,9 @@ import { AppConfigService } from '../app/app.config.service';
 import { EffectsModule } from '@ngrx/effects'
 import { AppEffects } from '../app/app.effects'; 
 import { RestService } from './_services/model.service';
+import { SaveDailogBoxComponent } from './save-dailog-box/save-dailog-box.component';
+import { ClosingDayEntryComponent } from './closing-day-entry/closing-day-entry.component';
+
 
 
 @NgModule({
@@ -43,6 +46,8 @@ import { RestService } from './_services/model.service';
     HomeComponent,
     PumpInfoDailogComponent,
     DeliverUpdatePageComponent,
+    SaveDailogBoxComponent,
+    ClosingDayEntryComponent,
   ],
   imports: [
     BrowserModule,

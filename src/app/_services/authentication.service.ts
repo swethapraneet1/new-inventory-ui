@@ -89,6 +89,7 @@ export class AuthenticationService {
           console.log('authenticationuserdata', userData);
           if (userData && userData.token) {
             this.store.dispatch(AppAction.getSitesDropdown());
+            this.store.dispatch(AppAction.getTotalGrades());
           }
         });
       }

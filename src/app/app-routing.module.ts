@@ -7,7 +7,8 @@ import { LoginComponent } from './login';
 import { LoadingComponent } from './loading';
 import { PriceChangeComponent } from './price-change/price-change.component';
 import { HomeComponent } from './home/home.component';
-import { DeliverUpdatePageComponent } from './deliver-update-page/deliver-update-page.component'
+import { DeliverUpdatePageComponent } from './deliver-update-page/deliver-update-page.component';
+import { ClosingDayEntryComponent } from './closing-day-entry/closing-day-entry.component';
 
 
 // const routes: Routes = [];
@@ -35,6 +36,11 @@ const routes: Routes = [
   {
     path:'deliverypage',
     component:DeliverUpdatePageComponent,
+    canActivate:[AuthGuard]
+  },
+  {
+    path:'closingDayEntry',
+    component:ClosingDayEntryComponent,
     canActivate:[AuthGuard]
   },
 

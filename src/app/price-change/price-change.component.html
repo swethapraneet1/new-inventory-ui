@@ -18,16 +18,16 @@
       class="mat-elevation-z0"
       [dataSource]="dataSource" [trackBy]="trackRows">
        <!-- Pump Column -->
-       <ng-container matColumnDef="pump">
+       <ng-container matColumnDef="pumpName">
         <!-- <mat-header-cell *matHeaderCellDef>Product</mat-header-cell>  -->
        <mat-cell *matCellDef="let row; let i = index"> 
          <ng-container [formGroup]="row">
            <mat-form-field>
              <mat-label>pump</mat-label>
              <input matInput  placeholder="pump"
-               id="pump_id_{{i}}"
-               name="pump_id_{{i}}"
-               formControlName="pump" [readonly]="true"  />
+               id="pumpName_id_{{i}}"
+               name="pumpName_id_{{i}}"
+               formControlName="pumpName" [readonly]="true"  />
           
            </mat-form-field>
          </ng-container>

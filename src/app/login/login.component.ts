@@ -49,6 +49,7 @@ export class LoginComponent implements OnInit {
         console.log('user', userData);
         if (userData && userData.token) {
           this.store.dispatch(AppAction.getSitesDropdown());
+         // this.store.dispatch(AppAction.getTotalGrades());
         }
       },
       (error) => {

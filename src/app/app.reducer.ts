@@ -48,6 +48,16 @@ export const appReducer = createReducer(
     error,
     loading: false,
   })),
+  on(AppAction.getTotalGradesSuccess, (state, { grades }) => ({
+    ...state,
+    grades,
+    loading: false,
+  })),
+  on(AppAction.getTotalGradesError, (state, error) => ({
+    ...state,
+    error,
+    loading: false,
+  })),
 );
 
 /**

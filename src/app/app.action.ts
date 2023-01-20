@@ -46,6 +46,19 @@ export const getUserDetailsError = createAction(
   '[app][user][getUserDetails] Get the  GetUserDetails failure',
   props<{ error: ErrorResponse[] }>()
 );
+export const getTotalGrades = createAction(
+  '[app][user][getTotalGrades] Get the GetUserDetails ',
+
+);
+export const getTotalGradesSuccess = createAction(
+  '[app][user][getUserDetails] Get the GetUserDetails success',
+  props<{ grades: {} }>()
+
+);
+export const getTotalGradesError = createAction(
+  '[app][user][getUserDetails] Get the  GetUserDetails failure',
+  props<{ error: ErrorResponse[] }>()
+);
 export const AppAction = {
   setSiteSelection,
   getSitesDropdown,
@@ -56,5 +69,8 @@ export const AppAction = {
   getGradeDropdownError,
   getUserDetails,
   getUserDetailsSuccess,
-  getUserDetailsError
+  getUserDetailsError,
+  getTotalGrades,
+  getTotalGradesSuccess,
+  getTotalGradesError
 };

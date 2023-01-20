@@ -31,9 +31,9 @@ export class BackendService {
     // console.log(http);
     // this.location.prepareExternalUrl(this.baseUrl);
     this.ds = Object.assign({}, db) || {};
-    console.log(this.ds);
+    // console.log(this.ds);
     this.baseUrl = this.appConfig.getBaseURL();
-    console.log('baseURL', this.baseUrl);
+    // console.log('baseURL', this.baseUrl);
   }
   ngOnInit() {
     this.authService = this.injector.get(AuthenticationService);
@@ -230,17 +230,20 @@ export class BackendService {
 
     return this.restService.get(action);
   }
-  // Home page Table loading//
-  getAllTableData() {
-    let action = 'Pumpdata';
-    return this.http.get(this.baseUrl + action, this.jwt());
+  getAllGrades(){
+    return this.restService.get('/grades')
   }
-  getTabledataPost(action: string, data: any) {
-    const url = `${this.baseUrl}${action}`;
-    return this.http.post(url, data, this.jwt());
+  // Home page Table loading//
+  getAllTableData(site) {
+    let action = '/home/';
+    return this.restService.get(action + site,);
+  }
+  getTabledataPost(site) {
+    let action = '/home/';
+    return this.restService.get(action + site,);
   }
   getGradeDropdown(site) {
-    console.log('site', site);
+    // console.log('site', site);
     let action = 'grades/';
     // let userinfo =JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
     // console.log("info",userinfo);
@@ -254,6 +257,9 @@ export class BackendService {
   SaveForm(obj) {
     return this.restService.post('/pricechange', obj);
   }
+  SaveFormClosingDay(obj) {
+    return this.restService.post('/closingday', obj);
+  }
   //end of home page table loading
 
   //Delivery Upadte//
@@ -261,9 +267,18 @@ export class BackendService {
     const url = `${this.baseUrl}${action}`;
     //const data  =[];
     // return data;
-    return this.http.post(url, data, this.jwt());
+    //return this.http.post(url, data, this.jwt());
+    return this.restService.post(action,data);
   }
   //end of delivery update
+  // getGradeWisePumpDetails(value1,value2){
+
+  // }
+
+  getGradeWisePumpDetails(grade, site){
+    let action = 'pumps/'
+return  this.restService.get(action + site + '/site/'+ grade +'/grade');
+  }
   //private helper methods
   private form() {
     let headers = new HttpHeaders({

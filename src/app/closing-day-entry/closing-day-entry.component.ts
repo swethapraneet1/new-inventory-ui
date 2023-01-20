@@ -8,7 +8,6 @@ import {
   FormControl,
 } from '@angular/forms';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
-import { ApicallService } from './price.service';
 import { Grade } from '../shared/common.model';
 import { selectSiteId, getGradeDropdwon } from '../../app/app.selectors';
 import { Store } from '@ngrx/store';
@@ -26,11 +25,11 @@ import { DailogBoxComponent } from '../dailog-box/dailog-box.component';
 import { SaveDailogBoxComponent } from '../save-dailog-box/save-dailog-box.component';
 
 @Component({
-  selector: 'app-price-change',
-  templateUrl: './price-change.component.html',
-  styleUrls: ['./price-change.component.scss'],
+  selector: 'app-closing-day-entry',
+  templateUrl: './closing-day-entry.component.html',
+  styleUrls: ['./closing-day-entry.component.scss']
 })
-export class PriceChangeComponent implements OnInit {
+export class ClosingDayEntryComponent implements OnInit {
   grades = [];
   selectedGrades: null;
   form: FormGroup;
@@ -53,7 +52,6 @@ export class PriceChangeComponent implements OnInit {
   }
   constructor(
     private fb: FormBuilder,
-    private api: ApicallService,
     private store: Store,
     private router: Router,
     private changeDetectorRefs: ChangeDetectorRef,
@@ -79,7 +77,7 @@ export class PriceChangeComponent implements OnInit {
       }
       if (gradeDropDown !== undefined) {
         this.grades = gradeDropDown.res.grades[0];
-        console.log(this.grades);
+        // console.log(this.grades);
       }
     });
     // this.api.getGradeNames(this.site).subscribe((data) => {
@@ -88,6 +86,7 @@ export class PriceChangeComponent implements OnInit {
   }
   createForm() {
     this.form = this.fb.group({
+      dipValue: new FormControl(null, [Validators.required]),
       products: this.fb.array([]),
     });
   }
@@ -96,19 +95,21 @@ export class PriceChangeComponent implements OnInit {
     return row.value.uid;
   }
   savePriceChange() {
-    console.log(this.form.value.products.value);
+    console.log(this.form.value);
     this.isDisiable = 'false';
     let grade = [];
     grade.push({
       gradeId: this.selectedGrades,
       siteId: this.site,
-      priceChangeDateTime:new Date(),
+      closingDateTime:new Date(),
+      dipsValue:this.form.value.dipValue,
       pumps: this.form.value.products,
      
+
     });
-    console.log(grade[0]);
-    this.router.navigate(['/PriceChange']);
-    this.backendService.SaveForm(grade[0]).subscribe(
+    // console.log(grade[0]);
+
+    this.backendService.SaveFormClosingDay(grade[0]).subscribe(
       (res) => {
         const message = `succesfully saveed the data`;
         const dialogRef = this.dialog.open(SaveDailogBoxComponent, {
@@ -119,11 +120,12 @@ export class PriceChangeComponent implements OnInit {
           this.result = dialogResult;
 
           this.formRest();
+          this.router.navigate(['/closingDayEntry']);
         });
       },
       (err) => {
-        console.log('error', err);
-        const message = 'error in saving data please try again';
+        // console.log('error', err);
+        const message = 'error in saving data';
         let dialogRef = this.dialog.open(SaveDailogBoxComponent, {
           maxWidth: '400px',
           data: { name: message },
@@ -150,6 +152,7 @@ export class PriceChangeComponent implements OnInit {
             Validators.required,
           ],
           pumpId: [this.pumpData[i]['pumpId']],
+         // dipValue: [ Validators.required]
         })
       );
     }
@@ -191,6 +194,7 @@ export class PriceChangeComponent implements OnInit {
     this.gradeCall();
   }
   formRest() {
+    this.router.navigate(['/closingDayEntry']);
     this.productControlArray.controls = [];
     this.changeDetectorRefs.detectChanges();
     this.form.reset();
