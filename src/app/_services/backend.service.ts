@@ -237,12 +237,12 @@ export class BackendService {
   getAllTableData() {
     let action = '/home/';
     let site =1;
-    return this.restService.get(action + site,);
+    return this.restService.get(action + site);
   }
-  getTabledataPost() {
+  getTabledataPost(actions,data) {
     let action = '/home/';
     let site=1;
-    return this.restService.get(action + site,);
+    return this.restService.get(action + site);
   }
   getGradeDropdown(site) {
     // console.log('site', site);
