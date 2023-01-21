@@ -143,10 +143,10 @@ export class DeliverUpdatePageComponent implements OnInit {
       let res;
       customerArray.push(customer);
       this.backendService
-        .deliveryUpdateSave('/deliveryupdate', customerArray)
+        .deliveryUpdateSave('deliveryupdate', customerArray)
         .subscribe(
           (res) => {
-            const message = `succesfully saveed the data`;
+            const message = `succesfully saved the data`;
             const dialogRef = this.dialog.open(SaveDailogBoxComponent, {
               maxWidth: '400px',
               data: { name: message },
@@ -207,5 +207,9 @@ export class DeliverUpdatePageComponent implements OnInit {
     // instead of just logging it to the console
     console.error(error);
     return Observable.throw(error.json() || 'Server error');
+  }
+  ngDestroy(){
+    this.deliveryForm.reset();
+    
   }
 }

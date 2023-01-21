@@ -55,11 +55,12 @@ export class AppEffects {
       )
     )
   );
+  //Added this login activate when ever worked
   getUserDetails = createEffect(() =>
     this.actions$.pipe(
       ofType(AppAction.getUserDetails),
       switchMap((action) =>
-        this.dashboardService.logins(action.user).pipe(
+        this.dashboardService.login('signin',action.user).pipe(
           //  map((data: grade[]) => { //enable with original url
           map((response) => {
             return {

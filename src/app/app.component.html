@@ -23,9 +23,8 @@
        <!-- // <button (click)="reset()" *ngIf="timedOut">Restart</button> -->
             </span>
           </div>
-          <span>{{user.firstname}}</span>
-          <mat-card-title [hidden]="user!==null && user!==undefined" style="padding:5px;">
-            {{user?.firstname}} {{user?.lastname}} 
+          <mat-card-title [hidden]="user==null && user==undefined" style="padding:5px;">
+         <!-- {{user['username']}} -->
           </mat-card-title>
 
           <button mat-icon-button [matMenuTriggerFor]="menu">
@@ -89,9 +88,9 @@
       <div class="main-content" > <!-- [hidden]="!authService.isAuthenticated()"> -->
         <router-outlet></router-outlet>
       </div>
-      <footer class="footer" [ngStyle]="{'position': isMobile?'relative':'absolute'}">
+      <!-- <footer class="footer" [ngStyle]="{'position': isMobile?'relative':'absolute'}">
         <span style="font-family:sans-serif">&copy; CRM </span>
-      </footer>
+      </footer> -->
     </mat-sidenav-content>
   </mat-sidenav-container>
 

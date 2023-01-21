@@ -1,4 +1,10 @@
-import { Component, ViewChild, OnInit, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  ViewChild,
+  OnInit,
+  ChangeDetectorRef,
+  SimpleChanges,
+} from '@angular/core';
 import {
   FormGroup,
   FormBuilder,
@@ -24,12 +30,15 @@ import {
 } from '@angular/material/dialog';
 import { DailogBoxComponent } from '../dailog-box/dailog-box.component';
 import { SaveDailogBoxComponent } from '../save-dailog-box/save-dailog-box.component';
-
+interface pumpDataInterface{
+  pumps:[]
+ }
 @Component({
   selector: 'app-price-change',
   templateUrl: './price-change.component.html',
   styleUrls: ['./price-change.component.scss'],
 })
+
 export class PriceChangeComponent implements OnInit {
   grades = [];
   selectedGrades: null;
@@ -38,7 +47,7 @@ export class PriceChangeComponent implements OnInit {
   private uid = 0;
   disabled: boolean = true;
   showForm: boolean = true;
-  pumpData: any;
+  pumpData: any
   site: string = '';
   isDisiable = 'false';
   result: string = '';
@@ -63,11 +72,10 @@ export class PriceChangeComponent implements OnInit {
     this.createForm();
     this.dataSource = new MatTableDataSource(this.productControlArray.controls);
     this.store.select(selectSiteId).subscribe((siteId) => {
+      this.formRest1();
       if (siteId !== this.site) {
         this.site = siteId;
-        this.gradeCall();
-        this.selectedGrades = null;
-        this.showForm = true;
+        this.formRest1();
       }
     });
   }
@@ -79,7 +87,7 @@ export class PriceChangeComponent implements OnInit {
       }
       if (gradeDropDown !== undefined) {
         this.grades = gradeDropDown.res.grades[0];
-        console.log(this.grades);
+        // console.log(this.grades);
       }
     });
     // this.api.getGradeNames(this.site).subscribe((data) => {
@@ -96,17 +104,16 @@ export class PriceChangeComponent implements OnInit {
     return row.value.uid;
   }
   savePriceChange() {
-    console.log(this.form.value.products.value);
+    // console.log(this.form.value.products.value);
     this.isDisiable = 'false';
     let grade = [];
     grade.push({
       gradeId: this.selectedGrades,
       siteId: this.site,
-      priceChangeDateTime:new Date(),
+      priceChangeDateTime: new Date(),
       pumps: this.form.value.products,
-     
     });
-    console.log(grade[0]);
+    // console.log(grade[0]);
     this.router.navigate(['/PriceChange']);
     this.backendService.SaveForm(grade[0]).subscribe(
       (res) => {
@@ -170,12 +177,22 @@ export class PriceChangeComponent implements OnInit {
     this.isDisiable = 'true';
     this.backendService
       .getGradeWisePumpDetails(value, this.site)
-      .subscribe((res) => {
-        this.pumpData = res.pumps[0];
+      .subscribe((res:pumpDataInterface) => {
+        this.pumpData = res.pumps;
         this.changeDetectorRefs.detectChanges();
         if (this.pumpData.length > 0) {
           this.createRow();
         } else {
+          const message = `No pumps for ` + value;
+          const dialogRef = this.dialog.open(SaveDailogBoxComponent, {
+            maxWidth: '400px',
+            data: { name: message },
+          });
+          dialogRef.afterClosed().subscribe((dialogResult) => {
+            this.result = dialogResult;
+
+            this.formRest();
+          });
         }
       });
     // this.api.getFormInput(value).subscribe((data) => {
@@ -189,6 +206,10 @@ export class PriceChangeComponent implements OnInit {
   }
   ngOnInit(): void {
     this.gradeCall();
+    this.store.select(selectSiteId).subscribe((siteId) => {
+      this.site = siteId;
+      this.formRest1();
+    });
   }
   formRest() {
     this.productControlArray.controls = [];
@@ -196,7 +217,12 @@ export class PriceChangeComponent implements OnInit {
     this.form.reset();
     this.selectedGrades = null;
     this.isDisiable = 'false';
-    this.pumpData = [];
+    this.pumpData= []
+    this.showForm = true;
+  }
+  formRest1() {
+    this.selectedGrades = null;
+    this.isDisiable = 'false';
     this.showForm = true;
   }
   ngOnDestroy() {

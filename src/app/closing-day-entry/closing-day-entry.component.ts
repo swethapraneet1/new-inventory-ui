@@ -23,7 +23,9 @@ import {
 } from '@angular/material/dialog';
 import { DailogBoxComponent } from '../dailog-box/dailog-box.component';
 import { SaveDailogBoxComponent } from '../save-dailog-box/save-dailog-box.component';
-
+interface pumpDataInterface{
+  pumps:[]
+ }
 @Component({
   selector: 'app-closing-day-entry',
   templateUrl: './closing-day-entry.component.html',
@@ -61,6 +63,7 @@ export class ClosingDayEntryComponent implements OnInit {
     this.createForm();
     this.dataSource = new MatTableDataSource(this.productControlArray.controls);
     this.store.select(selectSiteId).subscribe((siteId) => {
+      
       if (siteId !== this.site) {
         this.site = siteId;
         this.gradeCall();
@@ -95,7 +98,7 @@ export class ClosingDayEntryComponent implements OnInit {
     return row.value.uid;
   }
   savePriceChange() {
-    console.log(this.form.value);
+    // console.log(this.form.value);
     this.isDisiable = 'false';
     let grade = [];
     grade.push({
@@ -173,12 +176,22 @@ export class ClosingDayEntryComponent implements OnInit {
     this.isDisiable = 'true';
     this.backendService
       .getGradeWisePumpDetails(value, this.site)
-      .subscribe((res) => {
-        this.pumpData = res.pumps[0];
+      .subscribe((res:pumpDataInterface) => {
+        this.pumpData = res.pumps;
         this.changeDetectorRefs.detectChanges();
         if (this.pumpData.length > 0) {
           this.createRow();
         } else {
+          const message = `No pumps for ` + value;
+          const dialogRef = this.dialog.open(SaveDailogBoxComponent, {
+            maxWidth: '400px',
+            data: { name: message },
+          });
+          dialogRef.afterClosed().subscribe((dialogResult) => {
+            this.result = dialogResult;
+
+            this.formRest();
+          });
         }
       });
     // this.api.getFormInput(value).subscribe((data) => {
@@ -203,10 +216,16 @@ export class ClosingDayEntryComponent implements OnInit {
     this.pumpData = [];
     this.showForm = true;
   }
+  formRest1() {
+    this.selectedGrades = null;
+    this.isDisiable = 'false';
+    this.showForm = true;
+  }
   ngOnDestroy() {
     this.showForm = true;
     this.form.reset();
     this.selectedGrades = null;
     this.isDisiable = 'false';
   }
+
 }

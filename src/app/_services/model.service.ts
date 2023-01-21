@@ -67,25 +67,25 @@ export class RestService {
 
     private httpRequestHandler(method: string, url: string, postBody: any, config?: any) {
         config = config || {};
+        let headers;
         config.timeout = config.timeout || 60000; // millisecs
-
-        let headers = new HttpHeaders();
-        // if (config?.['Content-Type'] === undefined) {
-        //     headers = headers.set('Content-Type', 'application/json');
-        // } else {
-        //     headers = headers.set('Content-Type', config['Content-Type']);
-        // }
-        const user = JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
+        let user = JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
         if (user && user.token) {
-            headers = headers.set('Authorization', 'Bearer ' + user.token);
-            headers = headers.set('Content-Type', 'application/json');
-            headers = headers.set('Access-Control-Allow-Origin', 'https://fuel-inventory-backend.onrender.com/api/v1/');
+         headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin':
+              'https://fuel-inventory-backend.onrender.com/api/v1/',
+            Authorization: 'Bearer ' + user.token,
+          });
         }else{
-            headers = headers.set('Content-Type', 'application/json');
+            headers = new HttpHeaders({
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin':
+                  'https://fuel-inventory-backend.onrender.com/api/v1/',
+               // Authorization: 'Bearer ' + user.token,
+              });
         }
-        // if (this.csrfToken) {
-        //     headers = headers.set('X-XSRF-TOKEN', this.csrfToken);
-        // }
+        
 
         const params = method === 'GET' && config.params ? new HttpParams({ fromObject: config.params }) : undefined;
         if(config.timeout !== 'no_timeout'){

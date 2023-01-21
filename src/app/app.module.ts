@@ -30,6 +30,7 @@ import { AppEffects } from '../app/app.effects';
 import { RestService } from './_services/model.service';
 import { SaveDailogBoxComponent } from './save-dailog-box/save-dailog-box.component';
 import { ClosingDayEntryComponent } from './closing-day-entry/closing-day-entry.component';
+import {HomeApicallService} from '../app/home/home.service';
 
 
 
@@ -71,7 +72,8 @@ import { ClosingDayEntryComponent } from './closing-day-entry/closing-day-entry.
     BackendService,
     AuthenticationService,
     ,AppConfigService,
-    RestService
+    RestService,
+    HomeApicallService
     
   ],
   bootstrap: [AppComponent]

@@ -1,11 +1,4 @@
 import { Component, OnInit, Input } from '@angular/core';
-import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger,
-} from '@angular/animations';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { PumpInfoDailogComponent } from '../pump-info-dailog/pump-info-dailog.component';
 import { MatTableDataSource } from '@angular/material/table';
@@ -14,83 +7,121 @@ import { getLocaleDateFormat } from '@angular/common';
 import { AuthenticationService } from '../_services';
 import { Store } from '@ngrx/store';
 import { setSiteSelection } from '../../app/app.action';
-import { selectSiteId,getSiteDropdwon,getUserDetails } from '../../app/app.selectors';
+import { selectSiteId } from '../../app/app.selectors';
+import { HomeApicallService } from './home.service';
 interface sites {
   value: string;
   viewValue: string;
+}
+interface grade {
+  gradeNames: [];
 }
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
-  animations: [
-    trigger('detailExpand', [
-      state('collapsed', style({ height: '0px', minHeight: '0' })),
-      state('expanded', style({ height: '*' })),
-      transition(
-        'expanded <=> collapsed',
-        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')
-      ),
-    ]),
-  ],
 })
 export class HomeComponent implements OnInit {
   @Input() viewValue: string;
-  //code for dropdown =
-  sites: sites[] = [
-    { value: '1', viewValue: 'site1' },
-    { value: '2', viewValue: 'site2' },
-    { value: '3', viewValue: 'site3' },
+  displayColumns = ['PumpName'];
+
+  displayedColumns: string[] = [
+    //after integration change the  displayColumns to  displayedColumns
+    // 'pumpName',
+    // 'ULP.soldData.dollarsValue',
+    // 'ULP.soldData.litersValue',
+    // 'P-95.soldData.dollarsValue',
+    // 'P-95.soldData.litersValue',
+    // 'DIS.soldData.dollarsValue',
+    // 'DIS.soldData.litersValue',
   ];
-  // selectedSites = this.sites[0].value;
-  //end of code for sites dropdown
-  //new code//
-  name = 'Angular 5';
-  displayedColumns = ['Title', 'grade1', 'grade2', 'grade3', 'id'];
-  displayedColumns2 = ['liters', 'price'];
-  displayedColumns3 = ['Rules'];
   errorMessage = '';
   responseData: [];
   site: string;
   // dataSource: any; enable when request with backend server
   date = new Date();
+  grades: string[] = [];
+  data = [
+    {
+      pumpId: 1,
+      pumpName: 'PUMP 1',
+      ULP: {
+        gradeName: 'ULP',
+        gradeId: 1,
+        soldData: {
+          closingDateTime: '2022-10-10T18:30',
+          litersValue: -1,
+          dollarsValue: -1,
+        },
+      },
+      'P-95': {
+        gradeName: 'P-95',
+        gradeId: 2,
+        soldData: {
+          closingDateTime: '2022-10-10T18:30',
+          litersValue: 2,
+          dollarsValue: 0,
+        },
+      },
 
-  dataSource = new MatTableDataSource<any>(ELEMENT_DATA); //disiable when request with backend server
-  getdata(data) {
-    return new MatTableDataSource<any>(data);
-  }
-  //end of new code//
+      DIS: {
+        gradeName: 'DIS',
+        gradeId: 3,
+        soldData: {
+          closingDateTime: '2022-10-10T18:30',
+          litersValue: 737,
+          dollarsValue: 1034,
+        },
+      },
+    },
+  ];
+  dataSource =[];
+  //disiable when request with backend server
 
   constructor(
     public dialog: MatDialog,
     private backendService: BackendService,
     public authService: AuthenticationService,
-    private store: Store
-  ) {}
-
-  ngOnInit(): void {
-    //let val = this.authService.siteValue()
-   
+    private store: Store,
+    private homeApiService: HomeApicallService
+  ) {
     this.store.select(selectSiteId).subscribe((siteId) => {
       this.site = siteId;
       console.log('home', this.site);
     });
-    this.store.select(getUserDetails).subscribe((user)=>{
-      console.log('home',user)
-    })
     this.getTableData();
+    if (this.site) {
+      this.backendService
+        .getTableGradesHeaders(this.site)
+        .subscribe((grades: grade) => {
+          this.grades = ['Name', ...grades.gradeNames];
+           this.displayedColumns = ['pumpName'];
+          let displayColumtemp = ['pumpName'];
+          for (let i = 0; i < this.grades.length; i++) {
+            if (i !== 0) {
+              const littervalue = '.soldData.litersValue';
+              const dollerValue = '.soldData.dollarsValue';
+              displayColumtemp.push(
+                this.grades[i] + littervalue,
+                this.grades[i] + dollerValue
+              );
+            }
+             this.displayedColumns = [...new Set(displayColumtemp)];
+             console.log(this.displayedColumns);
+             this.getTableData();
+          }
+        });
+    }
+  }
+
+  ngOnInit(): void {
+    //let val = this.authService.siteValue()
+
+    // this.getTableData();
     this.getTableDatapost();
   }
   getKeys(obj) {
     return Object.keys(obj);
-  }
-  toggleRow(element: { expanded: boolean }) {
-    console.log('toggled', element);
-    // Uncommnet to open only single row at once
-    // ELEMENT_DATA.forEach(row => {
-    //   row.expanded = false;
-    // })
-    element.expanded = !element.expanded;
   }
   openDialog(element) {
     console.log(element);
@@ -105,9 +136,9 @@ export class HomeComponent implements OnInit {
     });
   }
   getTableData() {
-    this.backendService.getAllTableData().subscribe(
-      (response) => {
-        //  this.dataSource = response; enable when make request from backend
+    this.backendService.getAllTableData(this.site).subscribe(
+      (response: any) => {
+     this.dataSource = response;
       },
       (error) => (this.errorMessage = error as any)
     );
@@ -116,142 +147,363 @@ export class HomeComponent implements OnInit {
     let data = {
       site: this.site,
     };
-    this.backendService.getTabledataPost('pumpData', data).subscribe(
-      (response) => {
-        console.log(response);
-        // this.dataSource = response;
-      },
-      (error) => (this.errorMessage = error as any)
-    );
+    // this.backendService.getTabledataPost('pumpData', data).subscribe(
+    //   (response) => {
+    //     console.log(response);
+    //     // this.dataSource = response;
+    //   },
+    //   (error) => (this.errorMessage = error as any)
+    // );
+  }
+  resolveEnum(num: number) {
+    if (num % 2 === 1) return 'DOLLARS';
+    else {
+      return 'LITERS';
+    }
+  }
+
+  getDisplay(eleObj: any, disObj: any) {
+    var test = disObj.split('.').reduce(function (o, key) {
+      return o[key];
+    }, eleObj);
+    if (test === -1) {
+      return (test = '');
+    }
+    return test;
+  }
+  getDisplayColumns() {
+    for (var i = 0; i < this.grades.length; i++) {
+      if (i !== 0) {
+        const littervalue = '.soldData.litersValue';
+        const dollerValue = '.soldData.litersValue';
+        this.displayedColumns.push(
+          this.grades[i] + littervalue,
+          this.grades[i] + dollerValue
+        );
+      }
+      return this.displayColumns;
+    }
+    console.log(this.displayColumns);
   }
 }
+// const ELEMENT_DATA: any[] = [
+//   {
+//     pumpId: 1,
+//     pumpName: 'PUMP 1',
 
-let ELEMENT_DATA = [
-  {
-    Group: 1,
-    grade: [
-      {
-        gradeId: '1',
-        gradeName: 'grade 1',
-        differenceData: [
-          {
-            date: '22-12-2022',
-            price: '$20',
-            liters: '10lts',
-          },
-        ],
-      },
-      {
-        gradeId: '2',
-        gradeName: 'grade 2',
-        differenceData: [
-          {
-            date: '22-12-2022',
-            price: '$30',
-            liters: '250lts',
-          },
-        ],
-      },
-      {
-        gradeId: '3',
-        gradeName: 'grade 3',
-        differenceData: [
-          {
-            date: '22-12-2022',
-            price: '$40',
-            liters: '50lts',
-          },
-        ],
-      },
-    ],
+//     ULP: {
+//       gradeId: 1,
+//       gradeName: 'ULP',
+//       soldData: {
+//         dollarsValue: 53,
+//         litersValue: 147,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//     P95: {
+//       gradeId: 2,
+//       gradeName: 'P-95',
+//       soldData: {
+//         dollarsValue: 0,
+//         litersValue: 2,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//     DIS: {
+//       gradeId: 3,
+//       gradeName: 'DIS',
+//       soldData: {
+//         dollarsValue: 1034,
+//         litersValue: 737,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//   },
+//   {
+//     pumpId: 2,
+//     pumpName: 'PUMP 2',
 
-    Title: 'PUMP1',
-    pumpId: '1',
-    pumpName: 'pump 1',
-  },
+//     ULP: {
+//       gradeId: 1,
+//       gradeName: 'ULP',
+//       soldData: {
+//         dollarsValue: 161234234234234,
+//         litersValue: 23423423423423423423,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//     P95: {
+//       gradeId: 2,
+//       gradeName: 'P-95',
+//       soldData: {
+//         dollarsValue: 0,
+//         litersValue: 0,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//     DIS: {
+//       gradeId: 3,
+//       gradeName: 'DIS',
+//       soldData: {
+//         dollarsValue: 457,
+//         litersValue: 0,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//   },
+//   {
+//     pumpId: 3,
+//     pumpName: 'PUMP 3',
+//     ULP: {
+//       gradeId: 1,
+//       gradeName: 'ULP',
+//       soldData: {
+//         dollarsValue: 235,
+//         litersValue: 317,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//     P95: {
+//       gradeId: 2,
+//       gradeName: 'P-95',
+//       soldData: {
+//         dollarsValue: 0,
+//         litersValue: 81,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//     DIS: {
+//       gradeId: 3,
+//       gradeName: 'DIS',
+//       soldData: {
+//         dollarsValue: 1150,
+//         litersValue: -1636,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//   },
+//   {
+//     pumpId: 4,
+//     pumpName: 'PUMP 4',
 
-  {
-    Group: 1,
-    grade: [
-      {
-        gradeId: '1',
-        gradeName: 'grade 1',
-        differenceData: [
-          {
-            date: '22-12-2022',
-            price: '$10',
-            liters: '10lts',
-          },
-        ],
-      },
-      {
-        gradeId: '2',
-        gradeName: 'grade 2',
-        differenceData: [
-          {
-            date: '22-12-2022',
-            price: '$40',
-            liters: '30lts',
-          },
-        ],
-      },
-      {
-        gradeId: '3',
-        gradeName: 'grade 3',
-        differenceData: [
-          {
-            date: '22-12-2022',
-            price: '$80',
-            liters: '30lts',
-          },
-        ],
-      },
-    ],
+//     ULP: {
+//       gradeId: 1,
+//       gradeName: 'ULP',
+//       soldData: {
+//         dollarsValue: 303,
+//         litersValue: 0,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//     P95: {
+//       gradeId: 2,
+//       gradeName: 'P-95',
+//       soldData: {
+//         dollarsValue: 148,
+//         litersValue: 0,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//     DIS: {
+//       gradeId: 3,
+//       gradeName: 'DIS',
+//       soldData: {
+//         dollarsValue: 1688,
+//         litersValue: 0,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//   },
+//   {
+//     pumpId: 5,
+//     pumpName: 'PUMP 5',
 
-    Title: 'PUMP2',
-    pumpId: '1',
-    pumpName: 'pump 2',
-  },
-  {
-    Group: 1,
-    grade: [
-      {
-        gradeId: '1',
-        gradeName: 'grade 1',
-        differenceData: [
-          {
-            date: '22-12-2022',
-            price: '$60',
-            liters: '80lts',
-          },
-        ],
-      },
-      {
-        gradeId: '2',
-        gradeName: 'grade 2',
-        differenceData: [
-          {
-            date: '22-12-2022',
-            price: '$20',
-            liters: '20lts',
-          },
-        ],
-      },
-      {
-        gradeId: '3',
-        gradeName: 'grade 3',
-        differenceData: [
-          {
-            date: '22-12-2022',
-            price: '$60',
-            liters: '10lts',
-          },
-        ],
-      },
-    ],
+//     ULP: {
+//       gradeId: 1,
+//       gradeName: 'ULP',
+//       soldData: {
+//         dollarsValue: 293,
+//         litersValue: 410,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//     P95: {
+//       gradeId: 2,
+//       gradeName: 'P-95',
+//       soldData: {
+//         dollarsValue: 54,
+//         litersValue: 69,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//     DIS: {
+//       gradeId: 3,
+//       gradeName: 'DIS',
+//       soldData: {
+//         dollarsValue: 706,
+//         litersValue: 3588,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//   },
+//   {
+//     pumpId: 6,
+//     pumpName: 'PUMP 6',
 
-    Title: 'PUMP3',
-    pumpId: '1',
-    pumpName: 'pump 3',
-  },
-];
+//     ULP: {
+//       gradeId: 1,
+//       gradeName: 'ULP',
+//       soldData: {
+//         dollarsValue: 402,
+//         litersValue: 0,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//     P95: {
+//       gradeId: 2,
+//       gradeName: 'P-95',
+//       soldData: {
+//         dollarsValue: 76,
+//         litersValue: 0,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//     DIS: {
+//       gradeId: 3,
+//       gradeName: 'DIS',
+//       soldData: {
+//         dollarsValue: 1443,
+//         litersValue: 0,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//   },
+//   {
+//     pumpId: 7,
+//     pumpName: 'PUMP 7',
+
+//     ULP: {
+//       gradeId: 1,
+//       gradeName: 'ULP',
+//       soldData: {
+//         dollarsValue: '',
+//         litersValue: '',
+//         closingDateTime: '',
+//       },
+//     },
+//     P95: {
+//       gradeId: 2,
+//       gradeName: 'P-95',
+//       soldData: {
+//         dollarsValue: '',
+//         litersValue: '',
+//         closingDateTime: '',
+//       },
+//     },
+//     DIS: {
+//       gradeId: 3,
+//       gradeName: 'DIS',
+//       soldData: {
+//         dollarsValue: 1125,
+//         litersValue: 562,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//   },
+//   {
+//     pumpId: 8,
+//     pumpName: 'PUMP 8',
+
+//     ULP: {
+//       gradeId: 1,
+//       gradeName: 'ULP',
+//       soldData: {
+//         dollarsValue: '',
+//         litersValue: '',
+//         closingDateTime: '',
+//       },
+//     },
+//     P95: {
+//       gradeId: 2,
+//       gradeName: 'P-95',
+//       soldData: {
+//         dollarsValue: '',
+//         litersValue: '',
+//         closingDateTime: '',
+//       },
+//     },
+//     DIS: {
+//       gradeId: 3,
+//       gradeName: 'DIS',
+//       soldData: {
+//         dollarsValue: 901,
+//         litersValue: 451,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//   },
+//   {
+//     pumpId: 9,
+//     pumpName: 'PUMP 9',
+
+//     ULP: {
+//       gradeId: 1,
+//       gradeName: 'ULP',
+//       soldData: {
+//         dollarsValue: '',
+//         litersValue: '',
+//         closingDateTime: '',
+//       },
+//     },
+//     P95: {
+//       gradeId: 2,
+//       gradeName: 'P-95',
+//       soldData: {
+//         dollarsValue: '',
+//         litersValue: '',
+//         closingDateTime: '',
+//       },
+//     },
+//     DIS: {
+//       gradeId: 3,
+//       gradeName: 'DIS',
+//       soldData: {
+//         dollarsValue: 1176,
+//         litersValue: 605,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//   },
+//   {
+//     pumpId: 10,
+//     pumpName: 'PUMP 10',
+
+//     ULP: {
+//       gradeId: 1,
+//       gradeName: 'ULP',
+//       soldData: {
+//         dollarsValue: '',
+//         litersValue: '',
+//         closingDateTime: '',
+//       },
+//     },
+//     P95: {
+//       gradeId: 2,
+//       gradeName: 'P-95',
+//       soldData: {
+//         dollarsValue: '',
+//         litersValue: '',
+//         closingDateTime: '',
+//       },
+//     },
+//     DIS: {
+//       gradeId: 3,
+//       gradeName: 'DIS',
+//       soldData: {
+//         dollarsValue: 947,
+//         litersValue: 474,
+//         closingDateTime: '2022-10-11T00:00:00.000Z',
+//       },
+//     },
+//   },
+// ];

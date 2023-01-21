@@ -11,7 +11,7 @@ import {
 import { DailogBoxComponent } from '../dailog-box/dailog-box.component';
 import { Store } from '@ngrx/store';
 import { AppAction } from '../app.action';
-import { getUserDetails } from '../app.selectors';
+import { getUserDetails, selectSiteId } from '../app.selectors';
 
 // const APP_USER_PROFILE = 'NG_CRM_USER_2.0';
 const APP_USER_PROFILE = 'FUEL_INVENTORY';
@@ -84,7 +84,8 @@ export class AuthenticationService {
           // store user details and token in local storage to keep user logged in between page refreshes
           user.token = data.token;
           user.isAuthenticated = true;
-          localStorage.setItem(APP_USER_PROFILE, JSON.stringify(user));
+          localStorage.setItem('FUEL_INVENTORY', JSON.stringify(user));
+          sessionStorage.setItem('FUEL_INVENTORY', JSON.stringify(user));
           const userData = JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
           console.log('authenticationuserdata', userData);
           if (userData && userData.token) {
@@ -98,16 +99,28 @@ export class AuthenticationService {
 
   logout() {
     // remove user from local storage to log user out
-    localStorage.removeItem(APP_USER_PROFILE);
+    localStorage.removeItem('FUEL_INVENTORY');
   }
 
   isAuthenticated() {
     let user = this.getUser(); // <User>JSON.parse(localStorage.getItem(APP_USER_PROFILE));
+    if(user === null){
+      this.store.select(selectSiteId).subscribe((user)=>{
+      user = user;
+      })
+    }
     return user && user.isAuthenticated ? true : false;
   }
 
   getUser() {
-    let user = <User>JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
+    let user;
+    user = <User>JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
+    if(user === null){
+      this.store.select(selectSiteId).subscribe((user)=>{
+      user = user;
+      })
+    }
+    // console.log('auth',user);
     return user;
   }
   pageRedirection() {
