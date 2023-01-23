@@ -31,6 +31,7 @@ import { RestService } from './_services/model.service';
 import { SaveDailogBoxComponent } from './save-dailog-box/save-dailog-box.component';
 import { ClosingDayEntryComponent } from './closing-day-entry/closing-day-entry.component';
 import {HomeApicallService} from '../app/home/home.service';
+import { LoadingTemplateComponent } from './loading-template/loading-template.component';
 
 
 
@@ -49,6 +50,7 @@ import {HomeApicallService} from '../app/home/home.service';
     DeliverUpdatePageComponent,
     SaveDailogBoxComponent,
     ClosingDayEntryComponent,
+    LoadingTemplateComponent,
   ],
   imports: [
     BrowserModule,

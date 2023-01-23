@@ -9,6 +9,8 @@ import { Store } from '@ngrx/store';
 import { setSiteSelection } from '../../app/app.action';
 import { selectSiteId } from '../../app/app.selectors';
 import { HomeApicallService } from './home.service';
+import 'rxjs/add/operator/finally';
+import { Observable, Subscription } from 'rxjs';
 interface sites {
   value: string;
   viewValue: string;
@@ -24,7 +26,7 @@ interface grade {
 export class HomeComponent implements OnInit {
   @Input() viewValue: string;
   displayColumns = ['PumpName'];
-
+  isLoading: boolean;
   displayedColumns: string[] = [
     //after integration change the  displayColumns to  displayedColumns
     // 'pumpName',
@@ -38,45 +40,10 @@ export class HomeComponent implements OnInit {
   errorMessage = '';
   responseData: [];
   site: string;
-  // dataSource: any; enable when request with backend server
   date = new Date();
   grades: string[] = [];
-  data = [
-    {
-      pumpId: 1,
-      pumpName: 'PUMP 1',
-      ULP: {
-        gradeName: 'ULP',
-        gradeId: 1,
-        soldData: {
-          closingDateTime: '2022-10-10T18:30',
-          litersValue: -1,
-          dollarsValue: -1,
-        },
-      },
-      'P-95': {
-        gradeName: 'P-95',
-        gradeId: 2,
-        soldData: {
-          closingDateTime: '2022-10-10T18:30',
-          litersValue: 2,
-          dollarsValue: 0,
-        },
-      },
-
-      DIS: {
-        gradeName: 'DIS',
-        gradeId: 3,
-        soldData: {
-          closingDateTime: '2022-10-10T18:30',
-          litersValue: 737,
-          dollarsValue: 1034,
-        },
-      },
-    },
-  ];
   dataSource =[];
-  //disiable when request with backend server
+  subs: Subscription[] = [];
 
   constructor(
     public dialog: MatDialog,
@@ -85,39 +52,22 @@ export class HomeComponent implements OnInit {
     private store: Store,
     private homeApiService: HomeApicallService
   ) {
-    this.store.select(selectSiteId).subscribe((siteId) => {
-      this.site = siteId;
-      console.log('home', this.site);
-    });
-    this.getTableData();
-    if (this.site) {
-      this.backendService
-        .getTableGradesHeaders(this.site)
-        .subscribe((grades: grade) => {
-          this.grades = ['Name', ...grades.gradeNames];
-           this.displayedColumns = ['pumpName'];
-          let displayColumtemp = ['pumpName'];
-          for (let i = 0; i < this.grades.length; i++) {
-            if (i !== 0) {
-              const littervalue = '.soldData.litersValue';
-              const dollerValue = '.soldData.dollarsValue';
-              displayColumtemp.push(
-                this.grades[i] + littervalue,
-                this.grades[i] + dollerValue
-              );
-            }
-             this.displayedColumns = [...new Set(displayColumtemp)];
-             console.log(this.displayedColumns);
-             this.getTableData();
-          }
-        });
-    }
+     this.subs.push(
+      this.store.select(selectSiteId).subscribe((siteId) => {
+        this.site = siteId;
+        console.log('home', this.site);
+        this.getTableData();
+        this.getTableHeaderValues()
+  
+      }),
+     )
   }
 
   ngOnInit(): void {
     //let val = this.authService.siteValue()
-
     // this.getTableData();
+    this.getTableHeaderValues()
+    //this.getTableData();
     this.getTableDatapost();
   }
   getKeys(obj) {
@@ -136,14 +86,14 @@ export class HomeComponent implements OnInit {
     });
   }
   getTableData() {
-    this.backendService.getAllTableData(this.site).subscribe(
+    this.backendService.getAllTableData(this.site).finally(() => this.isLoading = false).subscribe(
       (response: any) => {
      this.dataSource = response;
       },
       (error) => (this.errorMessage = error as any)
     );
   }
-  getTableDatapost() {
+  getTableDatapost() { // this method is used when ther is more info icon need to fetch data using this method
     let data = {
       site: this.site,
     };
@@ -185,325 +135,31 @@ export class HomeComponent implements OnInit {
     }
     console.log(this.displayColumns);
   }
+  getTableHeaderValues(){
+    if (this.site) {
+     return  this.backendService
+        .getTableGradesHeaders(this.site).finally(() => this.isLoading = false)
+        .subscribe((grades: grade) => {
+          this.grades = ['Name', ...grades.gradeNames];
+           this.displayedColumns = ['pumpName'];
+          let displayColumtemp = ['pumpName'];
+          for (let i = 0; i < this.grades.length; i++) {
+            if (i !== 0) {
+              const littervalue = '.soldData.litersValue';
+              const dollerValue = '.soldData.dollarsValue';
+              displayColumtemp.push(
+                this.grades[i] + littervalue,
+                this.grades[i] + dollerValue
+              );
+            }
+             this.displayedColumns = [...new Set(displayColumtemp)];
+             console.log(this.displayedColumns);
+             this.getTableData();
+          }
+        });
+    }
+  }
+  ngOnDestroy() {
+    this.subs.forEach(sub => sub.unsubscribe());
+  }
 }
-// const ELEMENT_DATA: any[] = [
-//   {
-//     pumpId: 1,
-//     pumpName: 'PUMP 1',
-
-//     ULP: {
-//       gradeId: 1,
-//       gradeName: 'ULP',
-//       soldData: {
-//         dollarsValue: 53,
-//         litersValue: 147,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//     P95: {
-//       gradeId: 2,
-//       gradeName: 'P-95',
-//       soldData: {
-//         dollarsValue: 0,
-//         litersValue: 2,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//     DIS: {
-//       gradeId: 3,
-//       gradeName: 'DIS',
-//       soldData: {
-//         dollarsValue: 1034,
-//         litersValue: 737,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//   },
-//   {
-//     pumpId: 2,
-//     pumpName: 'PUMP 2',
-
-//     ULP: {
-//       gradeId: 1,
-//       gradeName: 'ULP',
-//       soldData: {
-//         dollarsValue: 161234234234234,
-//         litersValue: 23423423423423423423,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//     P95: {
-//       gradeId: 2,
-//       gradeName: 'P-95',
-//       soldData: {
-//         dollarsValue: 0,
-//         litersValue: 0,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//     DIS: {
-//       gradeId: 3,
-//       gradeName: 'DIS',
-//       soldData: {
-//         dollarsValue: 457,
-//         litersValue: 0,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//   },
-//   {
-//     pumpId: 3,
-//     pumpName: 'PUMP 3',
-//     ULP: {
-//       gradeId: 1,
-//       gradeName: 'ULP',
-//       soldData: {
-//         dollarsValue: 235,
-//         litersValue: 317,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//     P95: {
-//       gradeId: 2,
-//       gradeName: 'P-95',
-//       soldData: {
-//         dollarsValue: 0,
-//         litersValue: 81,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//     DIS: {
-//       gradeId: 3,
-//       gradeName: 'DIS',
-//       soldData: {
-//         dollarsValue: 1150,
-//         litersValue: -1636,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//   },
-//   {
-//     pumpId: 4,
-//     pumpName: 'PUMP 4',
-
-//     ULP: {
-//       gradeId: 1,
-//       gradeName: 'ULP',
-//       soldData: {
-//         dollarsValue: 303,
-//         litersValue: 0,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//     P95: {
-//       gradeId: 2,
-//       gradeName: 'P-95',
-//       soldData: {
-//         dollarsValue: 148,
-//         litersValue: 0,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//     DIS: {
-//       gradeId: 3,
-//       gradeName: 'DIS',
-//       soldData: {
-//         dollarsValue: 1688,
-//         litersValue: 0,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//   },
-//   {
-//     pumpId: 5,
-//     pumpName: 'PUMP 5',
-
-//     ULP: {
-//       gradeId: 1,
-//       gradeName: 'ULP',
-//       soldData: {
-//         dollarsValue: 293,
-//         litersValue: 410,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//     P95: {
-//       gradeId: 2,
-//       gradeName: 'P-95',
-//       soldData: {
-//         dollarsValue: 54,
-//         litersValue: 69,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//     DIS: {
-//       gradeId: 3,
-//       gradeName: 'DIS',
-//       soldData: {
-//         dollarsValue: 706,
-//         litersValue: 3588,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//   },
-//   {
-//     pumpId: 6,
-//     pumpName: 'PUMP 6',
-
-//     ULP: {
-//       gradeId: 1,
-//       gradeName: 'ULP',
-//       soldData: {
-//         dollarsValue: 402,
-//         litersValue: 0,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//     P95: {
-//       gradeId: 2,
-//       gradeName: 'P-95',
-//       soldData: {
-//         dollarsValue: 76,
-//         litersValue: 0,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//     DIS: {
-//       gradeId: 3,
-//       gradeName: 'DIS',
-//       soldData: {
-//         dollarsValue: 1443,
-//         litersValue: 0,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//   },
-//   {
-//     pumpId: 7,
-//     pumpName: 'PUMP 7',
-
-//     ULP: {
-//       gradeId: 1,
-//       gradeName: 'ULP',
-//       soldData: {
-//         dollarsValue: '',
-//         litersValue: '',
-//         closingDateTime: '',
-//       },
-//     },
-//     P95: {
-//       gradeId: 2,
-//       gradeName: 'P-95',
-//       soldData: {
-//         dollarsValue: '',
-//         litersValue: '',
-//         closingDateTime: '',
-//       },
-//     },
-//     DIS: {
-//       gradeId: 3,
-//       gradeName: 'DIS',
-//       soldData: {
-//         dollarsValue: 1125,
-//         litersValue: 562,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//   },
-//   {
-//     pumpId: 8,
-//     pumpName: 'PUMP 8',
-
-//     ULP: {
-//       gradeId: 1,
-//       gradeName: 'ULP',
-//       soldData: {
-//         dollarsValue: '',
-//         litersValue: '',
-//         closingDateTime: '',
-//       },
-//     },
-//     P95: {
-//       gradeId: 2,
-//       gradeName: 'P-95',
-//       soldData: {
-//         dollarsValue: '',
-//         litersValue: '',
-//         closingDateTime: '',
-//       },
-//     },
-//     DIS: {
-//       gradeId: 3,
-//       gradeName: 'DIS',
-//       soldData: {
-//         dollarsValue: 901,
-//         litersValue: 451,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//   },
-//   {
-//     pumpId: 9,
-//     pumpName: 'PUMP 9',
-
-//     ULP: {
-//       gradeId: 1,
-//       gradeName: 'ULP',
-//       soldData: {
-//         dollarsValue: '',
-//         litersValue: '',
-//         closingDateTime: '',
-//       },
-//     },
-//     P95: {
-//       gradeId: 2,
-//       gradeName: 'P-95',
-//       soldData: {
-//         dollarsValue: '',
-//         litersValue: '',
-//         closingDateTime: '',
-//       },
-//     },
-//     DIS: {
-//       gradeId: 3,
-//       gradeName: 'DIS',
-//       soldData: {
-//         dollarsValue: 1176,
-//         litersValue: 605,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//   },
-//   {
-//     pumpId: 10,
-//     pumpName: 'PUMP 10',
-
-//     ULP: {
-//       gradeId: 1,
-//       gradeName: 'ULP',
-//       soldData: {
-//         dollarsValue: '',
-//         litersValue: '',
-//         closingDateTime: '',
-//       },
-//     },
-//     P95: {
-//       gradeId: 2,
-//       gradeName: 'P-95',
-//       soldData: {
-//         dollarsValue: '',
-//         litersValue: '',
-//         closingDateTime: '',
-//       },
-//     },
-//     DIS: {
-//       gradeId: 3,
-//       gradeName: 'DIS',
-//       soldData: {
-//         dollarsValue: 947,
-//         litersValue: 474,
-//         closingDateTime: '2022-10-11T00:00:00.000Z',
-//       },
-//     },
-//   },
-// ];

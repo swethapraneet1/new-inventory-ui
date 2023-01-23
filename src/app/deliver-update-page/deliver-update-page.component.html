@@ -86,11 +86,12 @@
           <span>Save</span>
         </button> -->
         <button type="submit" class="submitButton"  [disabled]="!deliveryForm.valid">Save</button>
-        <button class="submitButton" style="position: absolute;
+        <button class="submitButton" (click)="reset()" type="reset" style="position: absolute;
         left: 142px;">
           <span>Reset</span>
         </button>
       </mat-card-actions>
     </div>
   </mat-card>
+  <progress *ngIf="isLoading" class="loading">Loading...</progress>
 </form>

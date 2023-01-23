@@ -33,6 +33,7 @@ import {
 } from '@angular/material/dialog';
 import { DailogBoxComponent } from '../dailog-box/dailog-box.component';
 import { SaveDailogBoxComponent } from '../save-dailog-box/save-dailog-box.component';
+import 'rxjs/add/operator/finally';
 
 @Component({
   selector: 'app-deliver-update-page',
@@ -42,6 +43,9 @@ import { SaveDailogBoxComponent } from '../save-dailog-box/save-dailog-box.compo
 export class DeliverUpdatePageComponent implements OnInit {
   @ViewChildren(FormControlName, { read: ElementRef })
   formInputElements: ElementRef[];
+  
+  isLoading: boolean;
+
   sites: Site[];
   site: any;
   grade: Grade[];
@@ -143,10 +147,10 @@ export class DeliverUpdatePageComponent implements OnInit {
       let res;
       customerArray.push(customer);
       this.backendService
-        .deliveryUpdateSave('deliveryupdate', customerArray)
+        .deliveryUpdateSave('deliveryupdate', customerArray).finally(() => this.isLoading = false)
         .subscribe(
           (res) => {
-            const message = `succesfully saved the data`;
+            const message = `succesfully saveed the data`;
             const dialogRef = this.dialog.open(SaveDailogBoxComponent, {
               maxWidth: '400px',
               data: { name: message },
@@ -207,6 +211,9 @@ export class DeliverUpdatePageComponent implements OnInit {
     // instead of just logging it to the console
     console.error(error);
     return Observable.throw(error.json() || 'Server error');
+  }
+  reset(){
+    this.deliveryForm.reset();
   }
   ngDestroy(){
     this.deliveryForm.reset();

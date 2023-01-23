@@ -19,6 +19,7 @@ const APP_USER_PROFILE = 'FUEL_INVENTORY';
 export class AuthenticationService {
   selectedOption: string;
   sharedSiteData: string;
+  isLoading = false;
   constructor(
     private http: HttpClient,
     private backend: BackendService,

@@ -17,6 +17,7 @@ export class LoginComponent implements OnInit {
   model: any = {};
   isValidating = false;
   returnUrl: string;
+  isLoading = false;
   // isloading = true;
   // isAuthenticated = false;
   selectedOption: string;
@@ -38,12 +39,14 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
+    this.isLoading = true;
     this.store.dispatch(AppAction.getUserDetails({ user: this.model }));
     this.isValidating = true;
     // this.isloading = true
     this.authenticationService.login(this.model).subscribe(
       () => {
         // this.isAuthenticated =  true;
+        this.isLoading = false;
         console.log(' next action here ... ');
         const userData = JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
         console.log('user', userData);

@@ -1,4 +1,5 @@
-﻿<div style="height: 150px; overflow: hidden;"><svg viewBox="0 0 500 150" preserveAspectRatio="none"
+﻿
+<div style="height: 150px; overflow: hidden;"><svg viewBox="0 0 500 150" preserveAspectRatio="none"
     style="height: 100%; width: 100%;">
     <path d="M0.00,49.98 C149.99,150.00 271.49,-49.98 500.00,49.98 L500.00,0.00 L0.00,0.00 Z"
       style="stroke: none; fill: #08f;"></path>
@@ -9,7 +10,7 @@
       <!-- <div> -->
       <mat-card-header>
         <div mat-card-avatar class="example-header-image"></div>
-        <h2> CRM Demo</h2>
+        <h2>Fuel Inventory</h2>
       </mat-card-header>
       <mat-card-content class="field-item">
         <mat-form-field style="display: block" [ngClass]="{  'mat-input-error': f.submitted && !username.valid }">
@@ -30,4 +31,5 @@
       </mat-card-actions>
     </form>
   </mat-card>
+  <loading *ngIf="isLoading">{{ isLoading }}</loading>
 </div>
