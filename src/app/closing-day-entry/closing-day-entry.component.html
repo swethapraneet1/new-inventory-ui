@@ -1,4 +1,4 @@
-
+<progress *ngIf="isLoading" class="loading">Loading...</progress>
 <div>
     <mat-form-field appearance="fill">
       <mat-label>Select Grade</mat-label>
@@ -90,8 +90,9 @@
           Add New
         </button> -->
         <button   type="submit" mat-button color="primary"   [disabled]="!form.valid">submit</button>
-        <button  (click)="formRest1()" type="button" mat-button color="primary">Reset</button>
+        <!-- <button  (click)="formRest1()" type="button" mat-button color="primary">Reset</button> -->
       </mat-card-actions>
   
     </mat-card>
+
   </form>

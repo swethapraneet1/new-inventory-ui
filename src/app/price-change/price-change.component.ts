@@ -30,15 +30,14 @@ import {
 } from '@angular/material/dialog';
 import { DailogBoxComponent } from '../dailog-box/dailog-box.component';
 import { SaveDailogBoxComponent } from '../save-dailog-box/save-dailog-box.component';
-interface pumpDataInterface{
-  pumps:[]
- }
+interface pumpDataInterface {
+  pumps: [];
+}
 @Component({
   selector: 'app-price-change',
   templateUrl: './price-change.component.html',
   styleUrls: ['./price-change.component.scss'],
 })
-
 export class PriceChangeComponent implements OnInit {
   grades = [];
   selectedGrades: null;
@@ -47,7 +46,7 @@ export class PriceChangeComponent implements OnInit {
   private uid = 0;
   disabled: boolean = true;
   showForm: boolean = true;
-  pumpData: any
+  pumpData: any;
   site: string = '';
   isDisiable = 'false';
   result: string = '';
@@ -72,11 +71,14 @@ export class PriceChangeComponent implements OnInit {
     this.createForm();
     this.dataSource = new MatTableDataSource(this.productControlArray.controls);
     this.store.select(selectSiteId).subscribe((siteId) => {
-    //  this.formRest1();
+      //  this.formRest1();
+
       if (siteId !== this.site) {
         this.site = siteId;
-       // this.formRest1();
-       this.gradeCall();
+        //  this.formRest1();
+        this.formRest();
+        this.gradeCall();
+
       }
     });
   }
@@ -118,6 +120,7 @@ export class PriceChangeComponent implements OnInit {
     this.router.navigate(['/PriceChange']);
     this.backendService.SaveForm(grade[0]).subscribe(
       (res) => {
+        this.formRest();
         const message = `succesfully saveed the data`;
         const dialogRef = this.dialog.open(SaveDailogBoxComponent, {
           maxWidth: '400px',
@@ -125,8 +128,8 @@ export class PriceChangeComponent implements OnInit {
         });
         dialogRef.afterClosed().subscribe((dialogResult) => {
           this.result = dialogResult;
-
-          this.formRest();
+          // (this.form.get('products') as FormArray).clear();
+          // this.formRest();
         });
       },
       (err) => {
@@ -139,28 +142,32 @@ export class PriceChangeComponent implements OnInit {
         dialogRef.disableClose = true;
         dialogRef.afterClosed().subscribe((dialogResult) => {
           this.result = dialogResult;
-          this.formRest();
+          //  this.formRest();
         });
       }
     );
   }
   private addRow() {
-    const rows = this.productControlArray;
     for (let i = 0; i < this.pumpData.length; i++) {
-      rows.push(
-        this.fb.group({
-          // uid: this.nextUid(),
-          literValue: [0, Validators.required],
-          dollarValue: [0, Validators.required],
-          pumpName: [
-            this.pumpData[i]['pumpName'],
-            { value: '', disabled: true },
-            Validators.required,
-          ],
-          pumpId: [this.pumpData[i]['pumpId']],
-        })
-      );
+      // console.log('rows', rows);
+      // (this.form.get('products') as FormArray).clear();
+      let formGroup = this.fb.group({
+        // uid: this.nextUid(),
+        literValue: [0, Validators.required],
+        dollarValue: [0, Validators.required],
+        pumpName: [
+          this.pumpData[i]['pumpName'],
+          { value: '', disabled: true },
+          Validators.required,
+        ],
+        pumpId: [this.pumpData[i]['pumpId']],
+      });
+      // rows.push(
+      //   formGroup
+      // );
+      (this.form.get('products') as FormArray).push(formGroup);
     }
+    // (this.form.get('products') as FormArray).setValue(rows);
     this.showForm = false;
   }
 
@@ -175,16 +182,21 @@ export class PriceChangeComponent implements OnInit {
   }
   selectedGrade(value) {
     this.selectedGrades = value;
-    this.isDisiable = 'true';
+    this.isDisiable = 'false';
     this.backendService
       .getGradeWisePumpDetails(value, this.site)
-      .subscribe((res:pumpDataInterface) => {
+      .subscribe((res: pumpDataInterface) => {
         this.pumpData = res.pumps;
+        (this.form.get('products') as FormArray).clear();
         this.changeDetectorRefs.detectChanges();
         if (this.pumpData.length > 0) {
           this.createRow();
         } else {
-          const message = `No pumps for ` + value;
+          let displayvalue = this.grades.filter((filVal)=>{
+             return filVal.gradeId === value;
+             
+          })
+          const message = `No pumps for ` + displayvalue[0].gradeName;
           const dialogRef = this.dialog.open(SaveDailogBoxComponent, {
             maxWidth: '400px',
             data: { name: message },
@@ -196,40 +208,31 @@ export class PriceChangeComponent implements OnInit {
           });
         }
       });
-    // this.api.getFormInput(value).subscribe((data) => {
-    //   this.pumpData = data;
-    //   this.changeDetectorRefs.detectChanges();
-    //   if (this.pumpData.length > 0) {
-    //     this.createRow();
-    //   } else {
-    //   }
-    // });
   }
   ngOnInit(): void {
     this.gradeCall();
     this.store.select(selectSiteId).subscribe((siteId) => {
       this.site = siteId;
-      this.formRest1();
+      //this.formRest1();
     });
   }
   formRest() {
-    this.productControlArray.controls = [];
-    this.changeDetectorRefs.detectChanges();
-    this.form.reset();
+    (this.form.get('products') as FormArray).clear();
     this.selectedGrades = null;
     this.isDisiable = 'false';
-    this.pumpData= []
+    this.pumpData = [];
     this.showForm = true;
   }
   formRest1() {
+    location.reload();
     this.selectedGrades = null;
     this.isDisiable = 'false';
     this.showForm = true;
   }
   ngOnDestroy() {
-    this.showForm = true;
-    this.form.reset();
+    (this.form.get('products') as FormArray).clear();
     this.selectedGrades = null;
     this.isDisiable = 'false';
+    // this.subscriptions.forEach(s => s.unsubscribe());
   }
 }

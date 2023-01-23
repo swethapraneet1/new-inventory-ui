@@ -92,7 +92,7 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
     });
     // auto logout timer code starts
     // sets an idle timeout of 30 seconds, for testing purposes.
-    idle.setIdle(600);
+    idle.setIdle(800);
     // sets a timeout period of 5 seconds. after 10 seconds of inactivity, the user will be considered timed out.
     idle.setTimeout(5);
     // sets the default interrupts, in this case, things like clicks, scrolls, touches to the document

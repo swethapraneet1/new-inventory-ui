@@ -43,6 +43,7 @@ export class ClosingDayEntryComponent implements OnInit {
   site: string = '';
   isDisiable = 'false';
   result: string = '';
+  isLoading = false;
 
   @ViewChild('table') table: MatTable<any>;
 
@@ -63,12 +64,12 @@ export class ClosingDayEntryComponent implements OnInit {
     this.createForm();
     this.dataSource = new MatTableDataSource(this.productControlArray.controls);
     this.store.select(selectSiteId).subscribe((siteId) => {
-     // this.formRest1();
       if (siteId !== this.site) {
         this.site = siteId;
+        //  this.formRest1();
+        this.formRest();
         this.gradeCall();
-        this.selectedGrades = null;
-        this.showForm = true;
+
       }
     });
   }
@@ -98,6 +99,7 @@ export class ClosingDayEntryComponent implements OnInit {
     return row.value.uid;
   }
   savePriceChange() {
+    this.isLoading = true;
     // console.log(this.form.value);
     this.isDisiable = 'false';
     let grade = [];
@@ -114,6 +116,8 @@ export class ClosingDayEntryComponent implements OnInit {
 
     this.backendService.SaveFormClosingDay(grade[0]).subscribe(
       (res) => {
+        this.isLoading = false;
+        this.formRest();
         const message = `succesfully saveed the data`;
         const dialogRef = this.dialog.open(SaveDailogBoxComponent, {
           maxWidth: '400px',
@@ -122,11 +126,12 @@ export class ClosingDayEntryComponent implements OnInit {
         dialogRef.afterClosed().subscribe((dialogResult) => {
           this.result = dialogResult;
 
-          this.formRest();
+         
           this.router.navigate(['/closingDayEntry']);
         });
       },
       (err) => {
+        this.isLoading = false;
         // console.log('error', err);
         const message = 'error in saving data';
         let dialogRef = this.dialog.open(SaveDailogBoxComponent, {
@@ -142,24 +147,28 @@ export class ClosingDayEntryComponent implements OnInit {
     );
   }
   private addRow() {
-    const rows = this.productControlArray;
     for (let i = 0; i < this.pumpData.length; i++) {
-      rows.push(
-        this.fb.group({
-          // uid: this.nextUid(),
-          literValue: [0, Validators.required],
-          dollarValue: [0, Validators.required],
-          pumpName: [
-            this.pumpData[i]['pumpName'],
-            { value: '', disabled: true },
-            Validators.required,
-          ],
-          pumpId: [this.pumpData[i]['pumpId']],
-         // dipValue: [ Validators.required]
-        })
-      );
+      // console.log('rows', rows);
+      // (this.form.get('products') as FormArray).clear();
+      let formGroup = this.fb.group({
+        // uid: this.nextUid(),
+        literValue: [0, Validators.required],
+        dollarValue: [0, Validators.required],
+        pumpName: [
+          this.pumpData[i]['pumpName'],
+          { value: '', disabled: true },
+          Validators.required,
+        ],
+        pumpId: [this.pumpData[i]['pumpId']],
+      });
+      // rows.push(
+      //   formGroup
+      // );
+      (this.form.get('products') as FormArray).push(formGroup);
     }
+    // (this.form.get('products') as FormArray).setValue(rows);
     this.showForm = false;
+
   }
 
   createRow() {
@@ -173,16 +182,21 @@ export class ClosingDayEntryComponent implements OnInit {
   }
   selectedGrade(value) {
     this.selectedGrades = value;
-    this.isDisiable = 'true';
+    this.isDisiable = 'false';
     this.backendService
       .getGradeWisePumpDetails(value, this.site)
-      .subscribe((res:pumpDataInterface) => {
+      .subscribe((res: pumpDataInterface) => {
         this.pumpData = res.pumps;
+        (this.form.get('products') as FormArray).clear();
         this.changeDetectorRefs.detectChanges();
         if (this.pumpData.length > 0) {
           this.createRow();
         } else {
-          const message = `No pumps for ` + value;
+          let displayvalue = this.grades.filter((filVal)=>{
+             return filVal.gradeId === value;
+             
+          })
+          const message = `No pumps for ` + displayvalue[0].gradeName;
           const dialogRef = this.dialog.open(SaveDailogBoxComponent, {
             maxWidth: '400px',
             data: { name: message },
@@ -194,23 +208,42 @@ export class ClosingDayEntryComponent implements OnInit {
           });
         }
       });
-    // this.api.getFormInput(value).subscribe((data) => {
-    //   this.pumpData = data;
-    //   this.changeDetectorRefs.detectChanges();
-    //   if (this.pumpData.length > 0) {
-    //     this.createRow();
-    //   } else {
-    //   }
-    // });
+    // this.selectedGrades = value;
+    // this.isDisiable = 'true';
+    // this.backendService
+    //   .getGradeWisePumpDetails(value, this.site)
+    //   .subscribe((res:pumpDataInterface) => {
+    //     this.pumpData = res.pumps;
+    //     this.changeDetectorRefs.detectChanges();
+    //     if (this.pumpData.length > 0) {
+    //       this.createRow();
+    //     } else {
+    //       const message = `No pumps for ` + value;
+    //       const dialogRef = this.dialog.open(SaveDailogBoxComponent, {
+    //         maxWidth: '400px',
+    //         data: { name: message },
+    //       });
+    //       dialogRef.afterClosed().subscribe((dialogResult) => {
+    //         this.result = dialogResult;
+
+    //         this.formRest();
+    //       });
+    //     }
+    //   });
+    // // this.api.getFormInput(value).subscribe((data) => {
+    // //   this.pumpData = data;
+    // //   this.changeDetectorRefs.detectChanges();
+    // //   if (this.pumpData.length > 0) {
+    // //     this.createRow();
+    // //   } else {
+    // //   }
+    // // });
   }
   ngOnInit(): void {
     this.gradeCall();
   }
   formRest() {
-    this.router.navigate(['/closingDayEntry']);
-    this.productControlArray.controls = [];
-    this.changeDetectorRefs.detectChanges();
-    this.form.reset();
+    (this.form.get('products') as FormArray).clear();
     this.selectedGrades = null;
     this.isDisiable = 'false';
     this.pumpData = [];
@@ -222,8 +255,7 @@ export class ClosingDayEntryComponent implements OnInit {
     this.showForm = true;
   }
   ngOnDestroy() {
-    this.showForm = true;
-    this.form.reset();
+    (this.form.get('products') as FormArray).clear();
     this.selectedGrades = null;
     this.isDisiable = 'false';
   }
