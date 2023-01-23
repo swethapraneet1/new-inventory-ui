@@ -72,10 +72,11 @@ export class PriceChangeComponent implements OnInit {
     this.createForm();
     this.dataSource = new MatTableDataSource(this.productControlArray.controls);
     this.store.select(selectSiteId).subscribe((siteId) => {
-      this.formRest1();
+    //  this.formRest1();
       if (siteId !== this.site) {
         this.site = siteId;
-        this.formRest1();
+       // this.formRest1();
+       this.gradeCall();
       }
     });
   }
