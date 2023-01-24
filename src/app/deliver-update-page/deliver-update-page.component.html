@@ -1,4 +1,4 @@
-<form novalidate (ngSubmit)="savePriceChange()" [formGroup]="deliveryForm">
+<form  [formGroup]="deliveryForm" >
   <mat-card>
     <mat-toolbar style="background-color: #fff">
       <mat-toolbar-row>
@@ -7,17 +7,15 @@
       </mat-toolbar-row>
     </mat-toolbar>
     <div class="form-container">
-      <!-- <mat-form-field appearance="fill">
+      <mat-form-field appearance="fill" *ngIf="hideSiteID">
         <mat-label>SiteName</mat-label>
-        <mat-select
+        <input
+          matInput
+          type="number"
           formControlName="siteId"
-          placeholder="siteName (required)"
-        >
-          <mat-option [value]="option.siteId" *ngFor="let option of sites">{{
-            option.siteName
-          }}</mat-option>
-        </mat-select>
-      </mat-form-field> -->
+          placeholder="siteId (required)" 
+        />
+      </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>DocterType</mat-label>
         <input
@@ -56,8 +54,8 @@
         <input
           matInput
           id="PriceId"
-          type="currency"
-          placeholder="Price (required)"
+          type="number"
+          placeholder="liters (required)"
           formControlName="literValue"
         />
         <mat-error *ngIf="displayMessage.literValue">
@@ -84,8 +82,8 @@
           [disabled]="!deliveryForm.valid"
         >
           <span>Save</span>
-        </button> -->
-        <button type="submit" class="submitButton"  [disabled]="!deliveryForm.valid">Save</button>
+        </button> --> 
+        <button (click)="savePriceChange()" type="submit" class="submitButton"  [disabled]="deliveryForm.invalid || isNextDisabled">Save</button>
         <!-- <button class="submitButton" (click)="reset()" type="reset" style="position: absolute;
         left: 142px;">
           <span>Reset</span>
@@ -93,5 +91,8 @@
       </mat-card-actions>
     </div>
   </mat-card>
-  <progress *ngIf="isLoading" class="loading">Loading...</progress>
+  <!-- <progress *ngIf="isLoading" class="loading">Loading...</progress> -->
+  <div  *ngIf="isLoading"  class="d-flex align-items-center justify-content-center">
+    <div id="spinner"></div>
+</div>
 </form>
