@@ -35,6 +35,8 @@ import { DailogBoxComponent } from '../dailog-box/dailog-box.component';
 import { SaveDailogBoxComponent } from '../save-dailog-box/save-dailog-box.component';
 import 'rxjs/add/operator/finally';
 import { Router } from '@angular/router';
+import { AppAction } from '../app.action';
+import { getGradeDropdwon } from '../app.selectors';
 
 @Component({
   selector: 'app-deliver-update-page',
@@ -78,11 +80,12 @@ export class DeliverUpdatePageComponent implements OnInit {
         }
       }
     });
-    this.store.select(getTotalGrades).subscribe((grades) => {
-      if (grades !== undefined) {
-        this.grade = grades.res.grades[0];
-      }
-    });
+    this.gradeCall();
+    // this.store.select(getTotalGrades).subscribe((grades) => {
+    //   if (grades !== undefined) {
+    //     this.grade = grades.res.grades[0];
+    //   }
+    // });
   }
 
   ngOnInit(): void {
@@ -139,6 +142,23 @@ export class DeliverUpdatePageComponent implements OnInit {
       this.site = siteId;
     });
     return this.site;
+  }
+  gradeCall() {
+    this.store.dispatch(AppAction.getGradeDropDown({ siteId: this.site }));
+    this.store.select(getGradeDropdwon).subscribe((res) => {
+      if (res === undefined || res.res.grades[0].length < 0) {
+        this.store.dispatch(AppAction.getGradeDropDown({ siteId: this.site }));
+      }else{
+        if(res !== undefined) {
+          this.grade =res.res.grades[0];
+          // console.log(this.grades);
+        }
+      }
+
+    });
+    // this.api.getGradeNames(this.site).subscribe((data) => {
+    //   this.grades = data;
+    // });
   }
   ngDestroy() {
     this.deliveryForm.reset();
