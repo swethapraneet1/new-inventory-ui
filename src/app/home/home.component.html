@@ -1,7 +1,9 @@
 
 <div>
   <!-- <span>{{ date }}</span> -->
-  <loading *ngIf="isLoading">{{ isLoading }}</loading>
+  <!-- <loading *ngIf="isLoading">{{ isLoading }}</loading> -->
+  <div  *ngIf="isLoading"  class="d-flex align-items-center justify-content-center">
+    <div id="spinner"></div>
 </div>
 <div class="example-container mat-elevation-z8">
   <h4></h4>
