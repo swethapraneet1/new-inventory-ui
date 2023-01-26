@@ -52,6 +52,7 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
   site: Observable<number>;
   selectedValue: string;
   sites: sites[] = [];
+  username = '';
 
   constructor(
     // private loadingBar: SlimLoadingBarService,
@@ -64,10 +65,20 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
     private backendService: BackendService
   ) {
     // console.log(' constructor');
-    if (this.user === null || this.user === undefined) {
-      let userInfo = JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
-      // console.log('appComp', userInfo);
-    }
+    // this.user = JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
+    // this.username = this.user.firstname;
+    // console.log('userCon1',this.user.username);
+    this.store.select(getUserDetails).subscribe((user) => {
+      if(user === undefined || user === null){
+        this.user = JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
+        this.username = this.user.username;
+      }else{
+        this.user = user.res;
+        this.username = this.user.username;
+      }
+
+    });
+
     this.isloading = true;
 
     breakpointObserver
@@ -133,22 +144,28 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnInit(): void {
-    console.log('ngOnInit');
+    // console.log('ngOnInit');
     this.user = this.authService.getUser();
-    if (this.user === null || this.user === undefined || Object.keys(this.user).length === 0) {
-      this.store.select(getUserDetails).map((users) => {
-        this.user = users;
-        // console.log(this.user);
-      });
+    if (this.user) {
+      this.username = this.user.username;
     }
+
+    this.store.select(getUserDetails).map((users) => {
+      this.user = users.res;
+      if(this.user){
+        this.username = this.user.username;
+      }
+     
+    });
+
     this.isloading = false;
 
-    console.log(this.user);
+    //console.log(this.user);
     this.store.dispatch(AppAction.getSitesDropdown());
-    this.store.dispatch(AppAction.getTotalGrades()); // don't remove 
+    // this.store.dispatch(AppAction.getTotalGrades()); // don't remove
     this.store.select(selectSiteId).subscribe((siteId) => {
       this.site = siteId;
-      console.log(this);
+      // console.log(this);
     });
     this.store.select(getSiteDropdwon).subscribe((dropdown) => {
       if (dropdown.res) {
@@ -176,8 +193,9 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
       this.user = this.authService.getUser();
       this.user = JSON.parse(localStorage.getItem('FUEL_INVENTORY')) || {};
       if (this.user === null) {
-        this.store.select(selectSiteId).subscribe((user) => {
-          this.user = user;
+        this.store.select(getUserDetails).subscribe((user) => {
+          this.user = user.res;
+          this.username = this.user.username;
         });
       }
     }

@@ -1,4 +1,4 @@
-<progress *ngIf="isLoading" class="loading">Loading...</progress>
+
 <div>
     <mat-form-field appearance="fill">
       <mat-label>Select Grade</mat-label>
@@ -48,7 +48,7 @@
           <mat-cell *matCellDef="let row; let i = index"> 
             <ng-container [formGroup]="row">
               <mat-form-field>
-                <mat-label>Liters</mat-label>
+                <mat-label>Liter Reading</mat-label>
                 <input matInput placeholder="liters"
                   id="liters_id_{{i}}"
                   name="liters_id_{{i}}"
@@ -64,7 +64,7 @@
           <mat-cell *matCellDef="let row; let i = index"> 
             <ng-container [formGroup]="row">
               <mat-form-field>
-                <mat-label>Price</mat-label>
+                <mat-label>Doller Reading</mat-label>
                 <input matInput placeholder="price"
                   id="price_id_{{i}}"
                   name="price_id_{{i}}"
@@ -96,3 +96,5 @@
     </mat-card>
 
   </form>
+  <div  *ngIf="isLoading"  class="d-flex align-items-center justify-content-center">
+    <div id="spinner"></div>

@@ -50,6 +50,7 @@ export class PriceChangeComponent implements OnInit {
   site: string = '';
   isDisiable = 'false';
   result: string = '';
+  isLoading = false;
 
   @ViewChild('table') table: MatTable<any>;
 
@@ -74,6 +75,7 @@ export class PriceChangeComponent implements OnInit {
       //  this.formRest1();
 
       if (siteId !== this.site) {
+        // console.log('changed');
         this.site = siteId;
         //  this.formRest1();
         this.formRest();
@@ -107,6 +109,7 @@ export class PriceChangeComponent implements OnInit {
     return row.value.uid;
   }
   savePriceChange() {
+    this.isLoading = true;
     // console.log(this.form.value.products.value);
     this.isDisiable = 'false';
     let grade = [];
@@ -120,8 +123,9 @@ export class PriceChangeComponent implements OnInit {
     this.router.navigate(['/PriceChange']);
     this.backendService.SaveForm(grade[0]).subscribe(
       (res) => {
+        this.isLoading = false;
         this.formRest();
-        const message = `succesfully saveed the data`;
+        const message = `succesfully saved the data`;
         const dialogRef = this.dialog.open(SaveDailogBoxComponent, {
           maxWidth: '400px',
           data: { name: message },
@@ -133,6 +137,7 @@ export class PriceChangeComponent implements OnInit {
         });
       },
       (err) => {
+        this.isLoading = false;
         console.log('error', err);
         const message = 'error in saving data please try again';
         let dialogRef = this.dialog.open(SaveDailogBoxComponent, {
@@ -181,10 +186,11 @@ export class PriceChangeComponent implements OnInit {
     return this.uid;
   }
   selectedGrade(value) {
+    this.isLoading = true;
     this.selectedGrades = value;
     this.isDisiable = 'false';
     this.backendService
-      .getGradeWisePumpDetails(value, this.site)
+      .getGradeWisePumpDetails(value, this.site).finally(() => (this.isLoading = false))
       .subscribe((res: pumpDataInterface) => {
         this.pumpData = res.pumps;
         (this.form.get('products') as FormArray).clear();

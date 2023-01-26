@@ -8,6 +8,11 @@
     
   </mat-form-field>
 </div>
+<div>
+  <div  *ngIf="isLoading"  class="d-flex align-items-center justify-content-center">
+    <div id="spinner"></div>
+  <!-- <loading *ngIf="isLoading">{{ isLoading }}</loading> -->
+</div>
 <form [formGroup]="form" (ngSubmit)="savePriceChange()"  [hidden]="showForm" >
 
   <mat-card class="mat-elevation-z8">

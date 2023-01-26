@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { PumpInfoDailogComponent } from '../pump-info-dailog/pump-info-dailog.component';
 import { MatTableDataSource } from '@angular/material/table';
@@ -23,10 +23,10 @@ interface grade {
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit,OnDestroy {
   @Input() viewValue: string;
   displayColumns = ['PumpName'];
-  isLoading: boolean;
+  isLoading = false;
   displayedColumns: string[] = [
     //after integration change the  displayColumns to  displayedColumns
     // 'pumpName',
@@ -42,7 +42,7 @@ export class HomeComponent implements OnInit {
   site: string;
   date = new Date();
   grades: string[] = [];
-  dataSource =[];
+  dataSource = [];
   subs: Subscription[] = [];
 
   constructor(
@@ -52,15 +52,14 @@ export class HomeComponent implements OnInit {
     private store: Store,
     private homeApiService: HomeApicallService
   ) {
-     this.subs.push(
+    this.subs.push(
       this.store.select(selectSiteId).subscribe((siteId) => {
         this.site = siteId;
-        console.log('home', this.site);
         this.getTableData();
         this.getTableHeaderValues()
-  
+
       }),
-     )
+    )
   }
 
   ngOnInit(): void {
@@ -74,7 +73,7 @@ export class HomeComponent implements OnInit {
     return Object.keys(obj);
   }
   openDialog(element) {
-    console.log(element);
+    //console.log(element);
     const dialogRef = this.dialog.open(PumpInfoDailogComponent, {
       data: { data: element },
       maxWidth: '100vw',
@@ -86,9 +85,11 @@ export class HomeComponent implements OnInit {
     });
   }
   getTableData() {
-    this.backendService.getAllTableData(this.site).finally(() => this.isLoading = false).subscribe(
+    this.isLoading = true
+    this.backendService.getAllTableData(this.site).subscribe(
       (response: any) => {
-     this.dataSource = response;
+        this.isLoading = false;
+        this.dataSource = response;
       },
       (error) => (this.errorMessage = error as any)
     );
@@ -113,16 +114,16 @@ export class HomeComponent implements OnInit {
   }
 
   getDisplay(eleObj: any, disObj: any) {
-    var test = disObj.split('.').reduce(function (o, key) {
+    let test = disObj.split('.').reduce(function (o, key) {
       return o[key];
     }, eleObj);
-    if (test === -1) {
+    if (test === 'N/A') {
       return (test = '');
     }
     return test;
   }
   getDisplayColumns() {
-    for (var i = 0; i < this.grades.length; i++) {
+    for (let i = 0; i < this.grades.length; i++) {
       if (i !== 0) {
         const littervalue = '.soldData.litersValue';
         const dollerValue = '.soldData.litersValue';
@@ -133,15 +134,15 @@ export class HomeComponent implements OnInit {
       }
       return this.displayColumns;
     }
-    console.log(this.displayColumns);
+    // console.log(this.displayColumns);
   }
-  getTableHeaderValues(){
+  getTableHeaderValues() {
     if (this.site) {
-     return  this.backendService
+      return this.backendService
         .getTableGradesHeaders(this.site).finally(() => this.isLoading = false)
         .subscribe((grades: grade) => {
           this.grades = ['Name', ...grades.gradeNames];
-           this.displayedColumns = ['pumpName'];
+          this.displayedColumns = ['pumpName'];
           let displayColumtemp = ['pumpName'];
           for (let i = 0; i < this.grades.length; i++) {
             if (i !== 0) {
@@ -152,14 +153,15 @@ export class HomeComponent implements OnInit {
                 this.grades[i] + dollerValue
               );
             }
-             this.displayedColumns = [...new Set(displayColumtemp)];
-             console.log(this.displayedColumns);
-             this.getTableData();
+            this.displayedColumns = [...new Set(displayColumtemp)];
+            // console.log(this.displayedColumns);
+            this.getTableData();
           }
         });
     }
   }
   ngOnDestroy() {
     this.subs.forEach(sub => sub.unsubscribe());
+    this.isLoading = false;
   }
 }

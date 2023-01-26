@@ -47,13 +47,13 @@ export class LoginComponent implements OnInit {
       () => {
         // this.isAuthenticated =  true;
         this.isLoading = false;
-        console.log(' next action here ... ');
-        const userData = JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
-        console.log('user', userData);
-        if (userData && userData.token) {
-          this.store.dispatch(AppAction.getSitesDropdown());
-         // this.store.dispatch(AppAction.getTotalGrades());
-        }
+       // console.log(' next action here ... ');
+        // const userData = JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
+        // console.log('user-login', userData);
+        // if (userData && userData.token) {
+        //   this.store.dispatch(AppAction.getSitesDropdown());
+        //  // this.store.dispatch(AppAction.getTotalGrades());
+        // }
       },
       (error) => {
         console.log(error);
@@ -66,5 +66,8 @@ export class LoginComponent implements OnInit {
         this.router.navigate([this.returnUrl]);
       }
     );
+  }
+  ngOnDestroy() {
+    this.isLoading = false;
   }
 }

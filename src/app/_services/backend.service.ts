@@ -73,19 +73,14 @@ export class BackendService {
     return this.http.post(this.baseUrl + 'closingday', obj, this.jwt());
   }
   deliveryUpdateSave(action: string, data) {
-    return this.http.post(this.baseUrl + 'deliveryupdate' , data, this.jwt());
+    return this.http.post(this.baseUrl + 'deliveryupdate', data, this.jwt());
   }
   getGradeWisePumpDetails(grade, site) {
     let action = 'pumps/';
-  //   return this.http.get(
-  //     this.baseUrl + action + site + '/site/' + grade + '/grade',this.jwt()
-  //   );
-  //   return  this.restService.get(action + site + '/site/'+ grade +'/grade');
-  
-    // let val = {"pumps":[[]]};
-    // return val.pumps
-    //  return  this.restService.get(action + site + '/site/'+ grade +'/grade');
-    return this.http.get(this.baseUrl +action + site + '/site/'+ grade +'/grade',this.jwt())
+    return this.http.get(
+      this.baseUrl + action + site + '/site/' + grade + '/grade',
+      this.jwt()
+    );
   }
   //private helper methods
   private form() {
@@ -96,10 +91,16 @@ export class BackendService {
     });
     return { headers: headers };
   }
-getTableGradesHeaders(siteId){
-  let action = 'grades/names/'
-  return this.http.get(this.baseUrl + action + siteId + '/site', this.jwt());
-}
+  getTableGradesHeaders(siteId) {
+    let action = 'grades/names/';
+    return this.http.get(this.baseUrl + action + siteId + '/site', this.jwt());
+  }
+  getSalesList(site){
+    return  this.http.get(this.baseUrl + 'saledetails/' + site , this.jwt());
+  }
+  SaveSalesList(obj){
+    return this.http.post(this.baseUrl + 'saledetails', obj, this.jwt());
+  }
   private jwt() {
     // create authorization header with jwt token
     // let user = this.authService.getUser() //JSON.parse( );
@@ -116,7 +117,7 @@ getTableGradesHeaders(siteId){
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin':
           'https://fuel-inventory-backend.onrender.com/api/v1/',
-           'Authorization': 'Bearer ' + user.token
+        Authorization: 'Bearer ' + user.token,
       });
       return { headers };
     }

@@ -102,7 +102,7 @@ export class DeliverUpdatePageComponent implements OnInit {
       });
   }
   savePriceChange() {
-    console.log(this.deliveryForm.value);
+   // console.log(this.deliveryForm.value);
     this.isLoading = true;
     let customerArray = [];
     customerArray.push(this.deliveryForm.value);

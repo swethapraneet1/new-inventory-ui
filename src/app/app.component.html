@@ -23,8 +23,8 @@
        <!-- // <button (click)="reset()" *ngIf="timedOut">Restart</button> -->
             </span>
           </div>
-          <mat-card-title [hidden]="user==null && user==undefined" style="padding:5px;">
-         <!-- {{user['username']}} -->{{user.username}}
+          <mat-card-title [hidden]="user!==null && user!==undefined" style="padding:5px;">
+         <!-- {{user['username']}} {{username}} -->
           </mat-card-title>
 
           <button mat-icon-button [matMenuTriggerFor]="menu">
@@ -43,21 +43,25 @@
           <span mat-line>HOME</span> 
         </a>
         <a mat-list-item routerLink="PriceChange">
-          <mat-icon mat-list-icon>info_outline</mat-icon>
+          <span mat-list-icon class="material-icons">price_change</span>
           <span mat-line>PRICE CHANGE</span>
         </a>
         <a mat-list-item routerLink="deliverypage">
-          <mat-icon mat-list-icon>info_outline</mat-icon>
+          <span mat-list-icon class="material-icons">local_shipping</span>
           <span mat-line>DELIVERY UPDATE</span>
         </a>
         <a mat-list-item routerLink="closingDayEntry">
-          <mat-icon mat-list-icon>info_outline</mat-icon>
+          <span mat-list-icon class='material-icons'>calendar_view_day</span>
           <span mat-line>CLOSING DAY ENTRY</span>
         </a>
-        <a mat-list-item routerLink="about">
+        <a mat-list-item routerLink="ShopSale">
+          <span  mat-list-icon class='material-icons'>point_of_sale</span>
+          <span mat-line>SALES DETAILS</span>
+        </a>
+        <!-- <a mat-list-item routerLink="about">
           <mat-icon mat-list-icon>info_outline</mat-icon>
           <span mat-line>ABOUT</span>
-        </a>
+        </a> -->
       </mat-nav-list>
     </mat-sidenav>
    
@@ -69,6 +73,7 @@
         </button>
         <span style="float:right">
        <div>
+        <span style="position: relative;left: 20%;"> Select Sites:</span>
         <mat-form-field appearance="fill" style="position: relative;left: 30%;">
           <mat-select  [(value)]="selectedValue" (selectionChange)="selected($event.value)">
             <mat-option [value]="option.siteId" *ngFor="let option of sites">{{ option.siteName }}</mat-option>
@@ -77,7 +82,7 @@
        
           
         </mat-form-field>
-        <mat-icon  mat-list-icon style="position: relative;left: 31%;" matTooltip="My tooltip">info_outline </mat-icon>
+        <!-- <mat-icon  mat-list-icon style="position: relative;left: 31%;" matTooltip="">info_outline </mat-icon> -->
        </div>
         </span>
        

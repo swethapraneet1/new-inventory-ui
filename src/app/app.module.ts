@@ -32,6 +32,7 @@ import { SaveDailogBoxComponent } from './save-dailog-box/save-dailog-box.compon
 import { ClosingDayEntryComponent } from './closing-day-entry/closing-day-entry.component';
 import {HomeApicallService} from '../app/home/home.service';
 import { LoadingTemplateComponent } from './loading-template/loading-template.component';
+import { ShopSalesDetailsComponent } from './shop-sales-details/shop-sales-details.component';
 
 
 
@@ -51,6 +52,7 @@ import { LoadingTemplateComponent } from './loading-template/loading-template.co
     SaveDailogBoxComponent,
     ClosingDayEntryComponent,
     LoadingTemplateComponent,
+    ShopSalesDetailsComponent,
   ],
   imports: [
     BrowserModule,

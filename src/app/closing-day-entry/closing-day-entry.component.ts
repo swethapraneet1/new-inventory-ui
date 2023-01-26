@@ -118,7 +118,7 @@ export class ClosingDayEntryComponent implements OnInit {
       (res) => {
         this.isLoading = false;
         this.formRest();
-        const message = `succesfully saveed the data`;
+        const message = `succesfully saved the data`;
         const dialogRef = this.dialog.open(SaveDailogBoxComponent, {
           maxWidth: '400px',
           data: { name: message },
@@ -181,11 +181,13 @@ export class ClosingDayEntryComponent implements OnInit {
     return this.uid;
   }
   selectedGrade(value) {
+    this.isLoading = true;
     this.selectedGrades = value;
     this.isDisiable = 'false';
     this.backendService
       .getGradeWisePumpDetails(value, this.site)
       .subscribe((res: pumpDataInterface) => {
+        this.isLoading = false;
         this.pumpData = res.pumps;
         (this.form.get('products') as FormArray).clear();
         this.changeDetectorRefs.detectChanges();

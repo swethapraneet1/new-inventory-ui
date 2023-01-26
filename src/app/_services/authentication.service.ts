@@ -62,6 +62,7 @@ export class AuthenticationService {
     // }
     // });
     return this.backend.login('signin', user).map((response: Response) => {
+      this.isLoading = false;
       // console.log('auth', 'response', response);
       // login successful if there's a token in the response
       let data = <any>response;
@@ -88,7 +89,7 @@ export class AuthenticationService {
           localStorage.setItem('FUEL_INVENTORY', JSON.stringify(user));
           sessionStorage.setItem('FUEL_INVENTORY', JSON.stringify(user));
           const userData = JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
-          console.log('authenticationuserdata', userData);
+        //  console.log('authenticationuserdata', userData);
           if (userData && userData.token) {
             this.store.dispatch(AppAction.getSitesDropdown());
             this.store.dispatch(AppAction.getTotalGrades());
@@ -105,22 +106,11 @@ export class AuthenticationService {
 
   isAuthenticated() {
     let user = this.getUser(); // <User>JSON.parse(localStorage.getItem(APP_USER_PROFILE));
-    if(user === null){
-      this.store.select(selectSiteId).subscribe((user)=>{
-      user = user;
-      })
-    }
     return user && user.isAuthenticated ? true : false;
   }
 
   getUser() {
-    let user;
-    user = <User>JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
-    if(user === null){
-      this.store.select(selectSiteId).subscribe((user)=>{
-      user = user;
-      })
-    }
+    let user = <User>JSON.parse(localStorage.getItem('FUEL_INVENTORY'));
     // console.log('auth',user);
     return user;
   }
@@ -130,5 +120,8 @@ export class AuthenticationService {
 
   siteValue() {
     return this.sharedSiteData;
+  }
+  ngOnDestroy() {
+    this.isLoading = false;
   }
 }

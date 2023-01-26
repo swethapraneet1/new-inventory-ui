@@ -1,0 +1,54 @@
+<div>
+  <div  *ngIf="isLoading"  class="d-flex align-items-center justify-content-center">
+    <div id="spinner"></div>
+</div>
+<div>
+  <form [formGroup]="salesForm" (ngSubmit)="saveSalesDetails()"  [hidden]="showForm" >
+    <mat-card class="mat-elevation-z8">
+      <mat-table
+        #salestable
+        class="mat-elevation-z0"
+        [dataSource]="SalesdataSource" [trackBy]="trackRows">
+         <!-- Name Column -->
+         <ng-container matColumnDef="name">
+          <!-- <mat-header-cell *matHeaderCellDef>Product</mat-header-cell>  -->
+         <mat-cell *matCellDef="let row; let i = index"> 
+           <ng-container [formGroup]="row">
+             <mat-form-field>
+               <mat-label>Name</mat-label>
+               <input matInput  placeholder="Name"
+                 id="name_id_{{i}}"
+                 name="name_id_{{i}}"
+                 formControlName="name" [readonly]="true"  />
+            
+             </mat-form-field>
+           </ng-container>
+         </mat-cell>
+       </ng-container>
+  
+        <!-- Value Column -->
+        <ng-container matColumnDef="value">
+           <!-- <mat-header-cell *matHeaderCellDef>Product</mat-header-cell>  -->
+          <mat-cell *matCellDef="let row; let i = index"> 
+            <ng-container [formGroup]="row">
+              <mat-form-field>
+                <mat-label>Liters</mat-label>
+                <input matInput placeholder="liters"
+                  id="value_id_{{i}}"
+                  name="value_id_{{i}}"
+                  formControlName="value" required  />
+              </mat-form-field>
+            </ng-container>
+          </mat-cell>
+        </ng-container>
+        <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+      </mat-table>
+  
+      <mat-card-actions>
+        <button class="button"  class="button" type="submit" mat-button color="primary">submit</button>
+      </mat-card-actions>
+  
+    </mat-card>
+  </form>
+</div>
+

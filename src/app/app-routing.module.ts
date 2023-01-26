@@ -9,6 +9,7 @@ import { PriceChangeComponent } from './price-change/price-change.component';
 import { HomeComponent } from './home/home.component';
 import { DeliverUpdatePageComponent } from './deliver-update-page/deliver-update-page.component';
 import { ClosingDayEntryComponent } from './closing-day-entry/closing-day-entry.component';
+import { ShopSalesDetailsComponent } from './shop-sales-details/shop-sales-details.component';
 
 
 // const routes: Routes = [];
@@ -48,6 +49,11 @@ const routes: Routes = [
     path: "Home",
     component: HomeComponent,
     canActivate: [AuthGuard]
+  },
+  {
+    path:'ShopSale',
+    component:ShopSalesDetailsComponent,
+    canActivate:[AuthGuard]
   },
   { path: '', redirectTo: 'Home', pathMatch: 'full' },
   {
