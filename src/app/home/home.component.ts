@@ -23,7 +23,7 @@ interface grade {
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-export class HomeComponent implements OnInit,OnDestroy {
+export class HomeComponent implements OnInit, OnDestroy {
   @Input() viewValue: string;
   displayColumns = ['PumpName'];
   isLoading = false;
@@ -55,25 +55,18 @@ export class HomeComponent implements OnInit,OnDestroy {
     this.subs.push(
       this.store.select(selectSiteId).subscribe((siteId) => {
         this.site = siteId;
-        this.getTableData();
-        this.getTableHeaderValues()
-
-      }),
-    )
+        this.getTableHeaderValues();
+      })
+    );
   }
 
   ngOnInit(): void {
-    //let val = this.authService.siteValue()
-    // this.getTableData();
-    this.getTableHeaderValues()
-    //this.getTableData();
     this.getTableDatapost();
   }
   getKeys(obj) {
     return Object.keys(obj);
   }
   openDialog(element) {
-    //console.log(element);
     const dialogRef = this.dialog.open(PumpInfoDailogComponent, {
       data: { data: element },
       maxWidth: '100vw',
@@ -85,16 +78,20 @@ export class HomeComponent implements OnInit,OnDestroy {
     });
   }
   getTableData() {
-    this.isLoading = true
-    this.backendService.getAllTableData(this.site).subscribe(
-      (response: any) => {
-        this.isLoading = false;
-        this.dataSource = response;
-      },
-      (error) => (this.errorMessage = error as any)
-    );
+    this.isLoading = true;
+    this.backendService
+      .getAllTableData(this.site)
+      .finally(() => (this.isLoading = false))
+      .subscribe(
+        (response: any) => {
+          this.isLoading = false;
+          this.dataSource = response;
+        },
+        (error) => (this.errorMessage = error as any)
+      );
   }
-  getTableDatapost() { // this method is used when ther is more info icon need to fetch data using this method
+  getTableDatapost() {
+    // this method is used when ther is more info icon need to fetch data using this method
     let data = {
       site: this.site,
     };
@@ -139,7 +136,7 @@ export class HomeComponent implements OnInit,OnDestroy {
   getTableHeaderValues() {
     if (this.site) {
       return this.backendService
-        .getTableGradesHeaders(this.site).finally(() => this.isLoading = false)
+        .getTableGradesHeaders(this.site)
         .subscribe((grades: grade) => {
           this.grades = ['Name', ...grades.gradeNames];
           this.displayedColumns = ['pumpName'];
@@ -155,13 +152,13 @@ export class HomeComponent implements OnInit,OnDestroy {
             }
             this.displayedColumns = [...new Set(displayColumtemp)];
             // console.log(this.displayedColumns);
-            this.getTableData();
           }
+          this.getTableData();
         });
     }
   }
   ngOnDestroy() {
-    this.subs.forEach(sub => sub.unsubscribe());
+    this.subs.forEach((sub) => sub.unsubscribe());
     this.isLoading = false;
   }
 }

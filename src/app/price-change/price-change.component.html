@@ -26,14 +26,15 @@
        <ng-container matColumnDef="pumpName">
         <!-- <mat-header-cell *matHeaderCellDef>Product</mat-header-cell>  -->
        <mat-cell *matCellDef="let row; let i = index"> 
-         <ng-container [formGroup]="row">
-           <mat-form-field>
-             <mat-label>pump</mat-label>
-             <input matInput  placeholder="pump"
+         <ng-container [formGroup]="row" >
+         
+           <mat-form-field appearance="outline"> 
+             <!-- <mat-label>Pump Name</mat-label> -->
+            
+             <input   matInput  placeholder="pump"
                id="pumpName_id_{{i}}"
                name="pumpName_id_{{i}}"
                formControlName="pumpName" [readonly]="true"  />
-          
            </mat-form-field>
          </ng-container>
        </mat-cell>
@@ -86,7 +87,7 @@
         <mat-icon>add</mat-icon>
         Add New
       </button> -->
-      <button class="button"  type="submit" mat-button color="primary">submit</button>
+      <button class="button"  type="submit" mat-button color="primary">SUBMIT</button>
       <!-- <button  (click)="formRest1()" type="button" mat-button color="primary">Reset</button> -->
     </mat-card-actions>
 

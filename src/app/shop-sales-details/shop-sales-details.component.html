@@ -32,8 +32,8 @@
           <mat-cell *matCellDef="let row; let i = index"> 
             <ng-container [formGroup]="row">
               <mat-form-field>
-                <mat-label>Liters</mat-label>
-                <input matInput placeholder="liters"
+                <mat-label>Total</mat-label>
+                <input matInput placeholder="Total"
                   id="value_id_{{i}}"
                   name="value_id_{{i}}"
                   formControlName="value" required  />

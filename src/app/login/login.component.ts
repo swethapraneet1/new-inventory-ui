@@ -7,6 +7,12 @@ import { Store } from '@ngrx/store';
 import { AppAction } from '../app.action';
 import { getUserDetails } from '../app.selectors';
 import { TOUCH_BUFFER_MS } from '@angular/cdk/a11y';
+import { SaveDailogBoxComponent } from '../save-dailog-box/save-dailog-box.component';
+import {
+  MatDialog,
+  MAT_DIALOG_DATA,
+  MatDialogRef,
+} from '@angular/material/dialog';
 @Component({
   selector: 'login-form',
   templateUrl: './login.component.html',
@@ -26,13 +32,14 @@ export class LoginComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private authenticationService: AuthenticationService,
-    private store: Store
+    private store: Store,
+    public dialog: MatDialog
   ) {}
 
   ngOnInit() {
     // this.authenticationService.logout();
-    this.model.username = 'karthik';
-    this.model.password = 'karthik';
+    this.model.username = '';
+    this.model.password = '';
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || 'loading';
     // this.isloading = false;
     // this.isAuthenticated =  false;
@@ -58,6 +65,16 @@ export class LoginComponent implements OnInit {
       (error) => {
         console.log(error);
         this.isValidating = false;
+        const dialogRef = this.dialog.open(SaveDailogBoxComponent, {
+          maxWidth: '400px',
+          data: { name: 'Incorrect username or password ' },
+        });
+        dialogRef.afterClosed().subscribe((dialogResult) => {
+          location.reload();
+          // (this.form.get('products') as FormArray).clear();
+          // this.formRest();
+        });
+        
       },
       () => {
         this.isValidating = false;

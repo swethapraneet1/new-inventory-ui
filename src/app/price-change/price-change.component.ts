@@ -4,6 +4,7 @@ import {
   OnInit,
   ChangeDetectorRef,
   SimpleChanges,
+  
 } from '@angular/core';
 import {
   FormGroup,
@@ -13,7 +14,7 @@ import {
   AbstractControl,
   FormControl,
 } from '@angular/forms';
-import { MatTable, MatTableDataSource } from '@angular/material/table';
+import { MatTable, MatTableDataSource, } from '@angular/material/table';
 import { ApicallService } from './price.service';
 import { Grade } from '../shared/common.model';
 import { selectSiteId, getGradeDropdwon } from '../../app/app.selectors';
@@ -21,6 +22,8 @@ import { Store } from '@ngrx/store';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppAction } from '../app.action';
 import { BackendService } from '../_services';
+
+
 
 // import { MatDialog } from '@angular/material/dialog';
 import {
@@ -30,6 +33,7 @@ import {
 } from '@angular/material/dialog';
 import { DailogBoxComponent } from '../dailog-box/dailog-box.component';
 import { SaveDailogBoxComponent } from '../save-dailog-box/save-dailog-box.component';
+import { style } from '@angular/animations';
 interface pumpDataInterface {
   pumps: [];
 }
@@ -39,6 +43,7 @@ interface pumpDataInterface {
   styleUrls: ['./price-change.component.scss'],
 })
 export class PriceChangeComponent implements OnInit {
+ 
   grades = [];
   selectedGrades: null;
   form: FormGroup;
@@ -51,6 +56,7 @@ export class PriceChangeComponent implements OnInit {
   isDisiable = 'false';
   result: string = '';
   isLoading = false;
+  isfield = false;
 
   @ViewChild('table') table: MatTable<any>;
 
@@ -163,7 +169,7 @@ export class PriceChangeComponent implements OnInit {
         pumpName: [
           this.pumpData[i]['pumpName'],
           { value: '', disabled: true },
-          Validators.required,
+          Validators.required
         ],
         pumpId: [this.pumpData[i]['pumpId']],
       });
@@ -216,11 +222,13 @@ export class PriceChangeComponent implements OnInit {
       });
   }
   ngOnInit(): void {
-    this.gradeCall();
-    this.store.select(selectSiteId).subscribe((siteId) => {
-      this.site = siteId;
-      //this.formRest1();
-    });
+  
+    
+   // this.gradeCall();
+    // this.store.select(selectSiteId).subscribe((siteId) => {
+    //   this.site = siteId;
+    //   //this.formRest1();
+    // });
   }
   formRest() {
     (this.form.get('products') as FormArray).clear();
